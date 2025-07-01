@@ -3,7 +3,7 @@ import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/ap
 
 const containerStyle = {
   width: "100%",
-  height: "500px",
+  height: "800px", // Increased height here
   borderRadius: "1rem",
 };
 
@@ -30,15 +30,15 @@ const HouseMap = ({ houses = [] }) => {
         center={center}
         zoom={13}
       >
-        {houses.map((house) => (
-          house.coordinates && (
+        {houses.map((house) =>
+          house.coordinates ? (
             <Marker
               key={house.id}
               position={house.coordinates}
               onClick={() => setSelectedHouse(house)}
             />
-          )
-        ))}
+          ) : null
+        )}
 
         {selectedHouse && (
           <InfoWindow
