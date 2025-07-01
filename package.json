@@ -19,6 +19,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.522.0",
     "react": "^19.1.0",
+    "react-calendar": "^6.0.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.59.0",
     "react-hot-toast": "^2.5.2",
@@ -28,6 +29,7 @@
     "react-swipeable": "^7.0.2",
     "react-switch": "^7.1.0",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.0.2",
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {

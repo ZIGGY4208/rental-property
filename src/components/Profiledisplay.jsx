@@ -16,7 +16,7 @@ const ProfileDisplay = () => {
             className="w-10 h-10 rounded-full object-cover"
             alt="Profile"
           />
-          <span>
+          <span className=''>
             {user.profile.firstName} {user.profile.lastName}
           </span>
         </div>

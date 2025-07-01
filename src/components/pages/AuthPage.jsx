@@ -5,12 +5,13 @@ import {
   saveUser,
   setCurrentUser,
 } from "../data/localStorageUtils";
-import { AtSign, Lock, Eye, EyeOff } from "lucide-react";
+import { AtSign, Lock, Eye, EyeOff, User } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 import Switch from "react-switch";
 
 const AuthPage = () => {
   const [isRegistering, setIsRegistering] = useState(true);
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -26,10 +27,12 @@ const AuthPage = () => {
         toast.error("User already exists!");
         return;
       }
-      saveUser({ email, password, role: "", profile: null });
-      setCurrentUser(email);
-      toast.success("Registration successful!");
-      navigate("/profile-setup");
+
+      // Save user with full name
+      saveUser({ fullName, email, password, role: "", profile: null });
+      toast.success("Registration successful! Please log in.");
+      setIsRegistering(false); // Switch to login view
+      // Don't navigate yet — let the user log in manually
     } else {
       const existing = getUserByEmail(email);
       if (!existing || existing.password !== password) {
@@ -38,7 +41,7 @@ const AuthPage = () => {
       }
       setCurrentUser(email);
       toast.success("Login successful!");
-      navigate("/");
+      navigate("/"); // Only navigate on successful login
     }
   };
 
@@ -68,6 +71,21 @@ const AuthPage = () => {
             width={40}
           />
         </div>
+
+        {/* Full Name (only in registration) */}
+        {isRegistering && (
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+              className={`w-full ${inputClass} px-12 py-3 rounded-lg outline-none`}
+            />
+            <User className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500" />
+          </div>
+        )}
 
         {/* Email Input */}
         <div className="relative">

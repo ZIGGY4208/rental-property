@@ -28,7 +28,7 @@ const HouseCard = ({ house }) => {
 
       {/* Price */}
       <p className="text-purple-600 font-semibold">
-        FCFA {house.price.toLocaleString()}
+        FCFA {house.price.toLocaleString()} <span>/Mouth</span>
       </p>
 
       {/* Poster Info */}

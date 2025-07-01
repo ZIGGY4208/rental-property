@@ -1,8 +1,16 @@
+// -----------------------------
+// USER STORAGE LOGIC
+// -----------------------------
+
 // Save user to localStorage
 export const saveUser = (user) => {
   const users = JSON.parse(localStorage.getItem("users")) || [];
   console.log("Saving new user:", user);
-  users.push(user);
+  users.push({
+    fullName: user.fullName,
+    email: user.email,
+    password: user.password,
+  });
   localStorage.setItem("users", JSON.stringify(users));
   console.log("All users after saving:", users);
 };
@@ -38,4 +46,30 @@ export const updateUserProfile = (email, profile) => {
   );
   localStorage.setItem("users", JSON.stringify(updated));
   console.log("Users after profile update:", updated);
+};
+
+// -----------------------------
+// HOUSE STORAGE LOGIC
+// -----------------------------
+
+const HOUSE_STORAGE_KEY = "uploaded_house_data";
+
+// Save house data
+export const saveHouseToStorage = (house) => {
+  console.log("Saving house data:", house);
+  localStorage.setItem(HOUSE_STORAGE_KEY, JSON.stringify(house));
+};
+
+// Get house data
+export const getStoredHouse = () => {
+  const data = localStorage.getItem(HOUSE_STORAGE_KEY);
+  const parsed = data ? JSON.parse(data) : null;
+  console.log("Retrieved stored house data:", parsed);
+  return parsed;
+};
+
+// Remove stored house data
+export const clearStoredHouse = () => {
+  console.log("Clearing stored house data");
+  localStorage.removeItem(HOUSE_STORAGE_KEY);
 };
