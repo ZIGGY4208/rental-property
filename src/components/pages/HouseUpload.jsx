@@ -13,7 +13,7 @@ const HouseUpload = () => {
   const [showing, setShowing] = useState(10);
 
   return (
-    <div className="h-screen bg-gray-100  font-sans p-6">
+    <div className="h-screen bg-gray-100  font-sans p-2">
       <div className="w-full h-full mx-auto  bg-white rounded-2xl shadow-lg p-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <h1 className="text-2xl font-semibold">Product</h1>

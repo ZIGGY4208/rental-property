@@ -1,34 +1,57 @@
-import React, { useState } from "react"; // Import React and useState hook
-import housesData from "./data/houses"; // Import the dummy house data
-import HouseCard from "./HouseCard"; // Component to display each house
-import FilterSidebar from "./FilterSidebar"; // Sidebar filter component
-import SearchBar from "./SearchBar"; // Top search bar component
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import housesData from "./data/houses";
+import HouseCard from "./HouseCard";
+import FilterSidebar from "./FilterSidebar";
+import SearchBar from "./SearchBar";
 
-// Main component to display and filter available houses
+// Utility to get filters from query parameters
+const getFiltersFromQuery = (locationSearch) => {
+  const params = new URLSearchParams(locationSearch);
+  const filters = {
+    type: params.get("type") || "",
+    location: params.get("location") || "",
+    price: parseInt(params.get("price")) || null,
+  };
+  console.log("📦 Extracted filters from URL:", filters);
+  return filters;
+};
+
 const AvailableHouses = () => {
-  const [filtered, setFiltered] = useState(housesData); // Stores filtered house list
-  const [visibleCount, setVisibleCount] = useState(9); // Number of visible houses
+  const [filtered, setFiltered] = useState(housesData);
+  const [visibleCount, setVisibleCount] = useState(9);
+  const location = useLocation();
 
-  // Function to filter houses based on filters or keyword search
-  const applyFilters = ({ type, location, minPrice, maxPrice, keyword }) => {
+  const applyFilters = ({ type, location, price }) => {
+    console.log("🔍 Applying filters:", { type, location, price });
+
+    const priceMargin = 10000; // Internal flexible margin (+/-10,000)
+
     const result = housesData.filter((house) => {
-      const matchesType = type ? house.type === type : true; // Filter by type
-      const matchesLocation = location ? house.location === location : true; // Filter by location
-      const matchesPrice = house.price >= minPrice && house.price <= maxPrice; // Filter by price range
-      const matchesKeyword = keyword
-        ? `${house.type} ${house.location} ${house.postedBy}`.toLowerCase().includes(keyword.toLowerCase()) // Keyword search
-        : true;
+      const matchesType = type ? house.type === type : true;
+      const matchesLocation = location ? house.location === location : true;
+      const matchesPrice =
+        price !== null
+          ? house.price >= price - priceMargin && house.price <= price + priceMargin
+          : true;
 
-      return matchesType && matchesLocation && matchesPrice && matchesKeyword; // All filters must pass
+      return matchesType && matchesLocation && matchesPrice;
     });
 
-    setFiltered(result); // Update filtered houses
-    setVisibleCount(9); // Reset visible count when filters are applied
+    console.log("🏘️ Filtered results:", result);
+    setFiltered(result);
+    setVisibleCount(9);
   };
 
-  // Function to show more houses when "Load More" is clicked
+  // Load filters from query params on mount or URL change
+  useEffect(() => {
+    const filters = getFiltersFromQuery(location.search);
+    applyFilters(filters);
+  }, [location.search]);
+
   const loadMore = () => {
-    setVisibleCount((prev) => prev + 9); // Increase visible count by 9
+    console.log("📥 Loading more houses...");
+    setVisibleCount((prev) => prev + 9);
   };
 
   return (
@@ -36,21 +59,35 @@ const AvailableHouses = () => {
       {/* Top search bar */}
       <SearchBar
         onSearch={(keyword) =>
-          applyFilters({ type: '', location: '', minPrice: 0, maxPrice: Infinity, keyword })
+          applyFilters({
+            type: "",
+            location: "",
+            price: null,
+            keyword,
+          })
         }
       />
 
       <div className="flex flex-col md:flex-row gap-6 mt-6">
         {/* Left sidebar with filters */}
         <aside className="md:w-1/4">
-          <FilterSidebar onFilterChange={applyFilters} />
+          <FilterSidebar
+            onFilterChange={applyFilters}
+            initialFilters={getFiltersFromQuery(location.search)}
+          />
         </aside>
 
-        {/* House results on the right */}
+        {/* House results or fallback message */}
         <main className="md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.slice(0, visibleCount).map((house) => (
-            <HouseCard key={house.id} house={house} />
-          ))}
+          {filtered.length === 0 ? (
+            <div className="col-span-full text-center text-gray-500 text-lg">
+              😢 No houses match your search. Try adjusting the filters.
+            </div>
+          ) : (
+            filtered.slice(0, visibleCount).map((house) => (
+              <HouseCard key={house.id} house={house} />
+            ))
+          )}
         </main>
       </div>
 
@@ -69,4 +106,4 @@ const AvailableHouses = () => {
   );
 };
 
-export default AvailableHouses; // Export component
+export default AvailableHouses;

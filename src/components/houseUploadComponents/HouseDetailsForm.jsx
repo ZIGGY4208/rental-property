@@ -11,18 +11,17 @@ const HouseDetailsForm = ({
   setDescription,
   rent,
   setRent,
-  discount,
-  setDiscount,
   className,
 }) => {
   return (
     <div className={`h-full flex flex-col bg-white rounded-xl shadow-md p-6 ${className}`}>
-      <div className="flex-1 flex flex-col gap-6 overflow-auto text-black">
+      {/* min-h-0 ensures the child can shrink properly when in flex layout */}
+      <div className="flex-1 flex flex-col gap-3 min-h-0 text-black">
         {/* House Title */}
-        <div className="flex flex-col flex-1">
-          <label className="block text-base font-semibold mb-2 text-black">House Title</label>
+        <div className="flex flex-col">
+          <label className="block text-sm font-medium mb-1 text-black">House Title</label>
           <input
-            className="w-full border border-purple-600 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="e.g., Spacious Self-Contain in Mile 16"
@@ -30,10 +29,10 @@ const HouseDetailsForm = ({
         </div>
 
         {/* House Type */}
-        <div className="flex flex-col flex-1">
-          <label className="block text-base font-semibold mb-2 text-black">House Type</label>
+        <div className="flex flex-col">
+          <label className="block text-sm font-medium mb-1 text-black">House Type</label>
           <input
-            className="w-full border border-purple-600 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm"
             value={houseType}
             onChange={(e) => setHouseType(e.target.value)}
             placeholder="e.g., Duplex, Studio, etc."
@@ -41,10 +40,10 @@ const HouseDetailsForm = ({
         </div>
 
         {/* Location */}
-        <div className="flex flex-col flex-1">
-          <label className="block text-base font-semibold mb-2 text-black">Location</label>
+        <div className="flex flex-col">
+          <label className="block text-sm font-medium mb-1 text-black">Location</label>
           <input
-            className="w-full border border-purple-600 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
             placeholder="e.g., Molyko, Check Point"
@@ -52,10 +51,10 @@ const HouseDetailsForm = ({
         </div>
 
         {/* Description */}
-        <div className="flex flex-col flex-[2]">
-          <label className="block text-base font-semibold mb-2 text-black">Description</label>
+        <div className="flex flex-col flex-grow">
+          <label className="block text-sm font-medium mb-1 text-black">Description</label>
           <textarea
-            className="w-full border border-purple-600 rounded-lg px-4 py-4 resize-none focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 h-full"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 resize-none focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm h-24"
             value={description}
             onChange={(e) => setDescription(e.target.value.slice(0, 1000))}
             placeholder="Provide a short description of the house"
@@ -63,26 +62,14 @@ const HouseDetailsForm = ({
         </div>
 
         {/* Rent Price */}
-        <div className="flex flex-col flex-1">
-          <label className="block text-base font-semibold mb-2 text-black">Rent Price</label>
+        <div className="flex flex-col">
+          <label className="block text-sm font-medium mb-1 text-black">Rent Price</label>
           <input
-            className="w-full border border-purple-600 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm"
             type="number"
             value={rent}
             onChange={(e) => setRent(e.target.value)}
             placeholder="e.g., 85000"
-          />
-        </div>
-
-        {/* Discount */}
-        <div className="flex flex-col flex-1">
-          <label className="block text-base font-semibold mb-2 text-black">Discount</label>
-          <input
-            className="w-full border border-purple-600 rounded-lg px-4 py-3 focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400"
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            placeholder="e.g., 5000"
           />
         </div>
       </div>

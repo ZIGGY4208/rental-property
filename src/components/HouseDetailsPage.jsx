@@ -1,14 +1,17 @@
-import React, { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import React, { useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Star, CalendarCheck } from "lucide-react";
 import houses from "./data/houses";
-import RelatedHouses from "../components/RelatedHouses"; // import related houses component
+import RelatedHouses from "../components/RelatedHouses";
+import ContactForm from "./ContactForm";
 
 export default function HouseDetailsPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const house = houses.find((h) => h.id === parseInt(id));
   const [selectedImage, setSelectedImage] = useState(0);
+  const contactRef = useRef();
+  const [highlighted, setHighlighted] = useState(false);
+  const [toast, setToast] = useState("");
 
   if (!house) {
     return <p className="text-center mt-20 text-red-600">House not found.</p>;
@@ -29,8 +32,31 @@ export default function HouseDetailsPage() {
       .join(" ");
   };
 
+  const handleScrollToContact = () => {
+    contactRef.current?.scrollIntoView({ behavior: "smooth" });
+
+    // Add a slight delay to trigger toast & highlight after scroll
+    setTimeout(() => {
+      setHighlighted(true);
+      setToast("📬 You're now ready to book your appointment.");
+
+      // Remove highlight after 2.5s
+      setTimeout(() => setHighlighted(false), 2500);
+
+      // Remove toast after 3.5s
+      setTimeout(() => setToast(""), 3500);
+    }, 600);
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12 bg-white text-black">
+    <div className="max-w-7xl mx-auto px-4 py-12 bg-white text-black relative">
+      {/* Toast Notification */}
+      {toast && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 bg-purple-600 text-white px-6 py-3 rounded shadow-lg z-50 transition duration-300">
+          {toast}
+        </div>
+      )}
+
       {/* Header */}
       <div className="grid md:grid-cols-2 gap-12">
         {/* Gallery */}
@@ -81,18 +107,15 @@ export default function HouseDetailsPage() {
           </div>
 
           <div className="text-2xl font-bold text-purple-600 mb-6">
-            FCFA {house.price.toLocaleString()} <span>/Mouth</span>
+            FCFA {house.price.toLocaleString()} <span>/Month</span>
           </div>
 
+          {/* Book an Appointment Button */}
           <button
-            onClick={() =>
-              navigate("/contact", {
-                state: { fromHouse: { type: house.type, location: house.location } },
-              })
-            }
+            onClick={handleScrollToContact}
             className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-full shadow flex items-center gap-2 transition"
           >
-            <CalendarCheck size={18} /> Book Now
+            <CalendarCheck size={18} /> Book an Appointment
           </button>
         </div>
       </div>
@@ -103,6 +126,16 @@ export default function HouseDetailsPage() {
         <p className="text-gray-700 text-sm leading-relaxed">
           {house.description} {generateEssayDetails(house.amenities)}
         </p>
+      </div>
+
+      {/* Contact Form Section (scroll target) */}
+      <div
+        ref={contactRef}
+        className={`mt-20 transition-all duration-500 ${
+          highlighted ? "ring-4 ring-purple-400 rounded-xl" : ""
+        }`}
+      >
+        <ContactForm />
       </div>
 
       {/* Related Houses */}

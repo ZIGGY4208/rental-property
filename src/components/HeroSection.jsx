@@ -25,8 +25,17 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-black opacity-80"></div>
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-start justify-start h-full text-left text-white px-4 pt-42 md:pl-16">
-        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
+      <div
+        className="
+          relative z-10 h-full w-full px-4 md:pl-16
+          flex flex-col
+          items-center justify-center
+          md:items-start md:justify-start
+          text-center md:text-left
+          text-white
+        "
+      >
+        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mt-42">
           Find a Place You'll Love
         </h1>
         <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-xl">
