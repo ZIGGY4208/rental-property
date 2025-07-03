@@ -24,7 +24,7 @@ const ContactHeroSection = () => (
           transition={{ delay: 0.5, duration: 0.8 }}
           className="text-white mt-4 text-lg"
         >
-          We're here to assist landlords and tenants alike.
+          We're here to help make finding and offering housing simple and stress-free.
         </motion.p>
       </motion.div>
     </div>
