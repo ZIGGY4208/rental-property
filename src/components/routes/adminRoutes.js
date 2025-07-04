@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 // Pages
-import Landlords from "../pages/Landlords";
+// import Landlords from "../pages/Landlords";
 import DashboardPage from "../pages/DashboardPage";
 import HousesPage from "../pages/HousesPage";
 // import Dashboard from "../pages/Admin/Dashboard";
@@ -49,13 +49,13 @@ export const adminRoutes = [
   //   component: Tenants,
   //   section: "main",
   // },
-  {
-    label: "Landlords",
-    path: "landlords",
-    icon: User,
-    component: Landlords,
-    section: "main",
-  },
+  // {
+  //   label: "Landlords",
+  //   path: "landlords",
+  //   icon: User,
+  //   component: Landlords,
+  //   section: "main",
+  // },
   // {
   //   label: "Bookings",
   //   path: "bookings",
