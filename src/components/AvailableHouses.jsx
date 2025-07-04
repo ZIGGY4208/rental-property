@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import housesData from "./data/houses";
 import HouseCard from "./HouseCard";
 import FilterSidebar from "./FilterSidebar";
 import SearchBar from "./SearchBar";
+import { Plus } from "lucide-react";
 
 // Utility to get filters from query parameters
 const getFiltersFromQuery = (locationSearch) => {
@@ -21,11 +22,12 @@ const AvailableHouses = () => {
   const [filtered, setFiltered] = useState(housesData);
   const [visibleCount, setVisibleCount] = useState(9);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const applyFilters = ({ type, location, price }) => {
     console.log("🔍 Applying filters:", { type, location, price });
 
-    const priceMargin = 10000; // Internal flexible margin (+/-10,000)
+    const priceMargin = 10000;
 
     const result = housesData.filter((house) => {
       const matchesType = type ? house.type === type : true;
@@ -43,7 +45,6 @@ const AvailableHouses = () => {
     setVisibleCount(9);
   };
 
-  // Load filters from query params on mount or URL change
   useEffect(() => {
     const filters = getFiltersFromQuery(location.search);
     applyFilters(filters);
@@ -56,28 +57,39 @@ const AvailableHouses = () => {
 
   return (
     <section className="p-4 bg-white min-h-screen text-black">
-      {/* Top search bar */}
-      <SearchBar
-        onSearch={(keyword) =>
-          applyFilters({
-            type: "",
-            location: "",
-            price: null,
-            keyword,
-          })
-        }
-      />
+      {/* Top search bar and Add House button */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <SearchBar
+          onSearch={(keyword) =>
+            applyFilters({
+              type: "",
+              location: "",
+              price: null,
+              keyword,
+            })
+          }
+        />
 
+        <button
+          onClick={() => navigate("/Admin")}
+          className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
+        >
+          <Plus size={18} />
+          Add House
+        </button>
+      </div>
+
+      {/* Filters and Listings */}
       <div className="flex flex-col md:flex-row gap-6 mt-6">
-        {/* Left sidebar with filters */}
-        <aside className="md:w-1/4">
+        {/* Left sidebar with max width */}
+        <aside className="md:w-1/4 max-w-sm">
           <FilterSidebar
             onFilterChange={applyFilters}
             initialFilters={getFiltersFromQuery(location.search)}
           />
         </aside>
 
-        {/* House results or fallback message */}
+        {/* Right content area */}
         <main className="md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.length === 0 ? (
             <div className="col-span-full text-center text-gray-500 text-lg">

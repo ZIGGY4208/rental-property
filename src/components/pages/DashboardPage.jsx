@@ -14,13 +14,14 @@ import {
   Wallet,
   MapPin,
 } from "lucide-react";
+import TopbarSection from "../dashboardComponents/TopbarSection";
 
 export default function DashboardPage() {
   return (
     <div className="flex min-h-screen overflow-hidden bg-gray-200">
       {/* <Sidebar /> */}
       <div className="flex-1 flex flex-col">
-        <TopBar />
+        <TopbarSection />
         <main className="flex-1 p-8 bg-gray-50">
           {/* Top row */}
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 h-[40%]">

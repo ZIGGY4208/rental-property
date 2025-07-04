@@ -1,5 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
+
 import Layout from './layout/Layout';
 import HomePage from "./components/pages/HomePage";
 import Landlords from "./components/pages/Landlords";
@@ -9,37 +10,50 @@ import Contact from "./components/pages/Contact";
 import StatsSection from "./components/StatsSection";
 import HouseDetailsPage from "./components/HouseDetailsPage";
 
-// New pages outside layout
 import AuthPage from "./components/pages/AuthPage";
 import ProfileSetup from "./components/pages/ProfileSetup";
 import ProductPage from "./components/ProductPage";
 import Dashboardpage from "./components/pages/DashboardPage";
 import AdminLayout from "./layout/AdminLayout";
 import { adminRoutes } from "./components/routes/adminRoutes";
-import ProductUpload from "./components/pages/HouseUploadPage";
 import HouseUploadPage from "./components/pages/HouseUploadPage";
-// import { adminRoutes } from "./routes/adminRoutes";  // Make sure path is correct
+
+
+import AdminLogin from "./components/dashboardComponents/AdminLogin";
+
+// import AdminLogin from "./components/pages/AdminLogin";
+import ProtectedRoute from "./components/dashboardComponents/ProtectedRoute";
 
 const App = () => {
   return (
     <Routes>
-      {/* 🔓 Routes outside layout */}
-      <Route path="/auth" element={<AuthPage />} />
-      <Route path="/profile-setup" element={<ProfileSetup />} />
-      <Route path="/product-page" element={<ProductPage />} />
-      <Route path="/dashboard" element={<Dashboardpage />} />
-      <Route path="/upload" element={<HouseUploadPage />} />
+      {/* 🔐 Admin Login (outside of layout) */}
+      <Route path="/Admin" element={<AdminLogin />} />
 
-      {/* Admin routes nested under AdminLayout */}
-      <Route path="/Admin" element={<AdminLayout />}>
+      {/* 🔐 Protected Admin Routes under AdminLayout */}
+      <Route
+        path="/Admin/*"
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
         {adminRoutes.map((route) => {
           const Component = route.component;
-          const path = route.path.replace('/Admin/', ''); // strip prefix for nested routing
+          const path = route.path.replace('/Admin/', '');
           return <Route key={path} path={path} element={<Component />} />;
         })}
       </Route>
 
-      {/* 🧱 Routes inside the main layout */}
+      {/* 🔓 Public Auth Pages */}
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/profile-setup" element={<ProfileSetup />} />
+      <Route path="/product-page" element={<ProductPage />} />
+      <Route path="/dashboard" element={<Dashboardpage />} />
+      <Route path="/uploadPage" element={<HouseUploadPage />} />
+
+      {/* 🧱 Public User-Facing Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="landlords" element={<Landlords />} />

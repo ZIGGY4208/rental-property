@@ -8,7 +8,7 @@ const statusStyles = {
   Bouncing: "bg-purple-100 text-purple-600",
 };
 
-const ProductTableRow = ({ product }) => (
+const HouseTableRow = ({ product }) => (
   <tr className="border-b border-gray-100 text-gray-700 hover:bg-gray-50">
     <td className="py-4 px-4 flex items-center gap-3">
       <img src={product.img} alt={product.name} className="w-8 h-8 rounded-full object-cover border border-gray-200" />
@@ -35,4 +35,4 @@ const ProductTableRow = ({ product }) => (
   </tr>
 );
 
-export default ProductTableRow;
+export default HouseTableRow;

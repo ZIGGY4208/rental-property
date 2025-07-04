@@ -15,7 +15,7 @@ import {
 // Pages
 import Landlords from "../pages/Landlords";
 import DashboardPage from "../pages/DashboardPage";
-import HouseUpload from "../pages/HouseUpload";
+import HousesPage from "../pages/HousesPage";
 // import Dashboard from "../pages/Admin/Dashboard";
 // import Properties from "../pages/Admin/Properties";
 // import Tenants from "../pages/Admin/Tenants";
@@ -39,7 +39,7 @@ export const adminRoutes = [
     label: "HouseUpload",
     path: "HouseUpload",
     icon: Building2,
-    component: HouseUpload,
+    component: HousesPage,
     section: "main",
   },
   // {
