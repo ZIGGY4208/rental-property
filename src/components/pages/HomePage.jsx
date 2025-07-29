@@ -5,13 +5,14 @@ import SearchByRequirement from '../SearchByRequirement'
 import LuxuriousPropertiesSection from '../LuxuriousPropertiesSection'
 import ComfortLivingSection from '../ComfortLivingSection'
 import TestimonialSection from '../TestimonialSection'
+import FeatureCards from '../FeatureCards'
 
 const HomePage = () => {
   return (
     <div>
       <div>
         <HeroSection/>
-        <FilterSection/>
+        <FeatureCards/>
         <SearchByRequirement/>
         <LuxuriousPropertiesSection/>
         <ComfortLivingSection/>
