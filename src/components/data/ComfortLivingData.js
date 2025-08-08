@@ -1,7 +1,7 @@
 export const properties = [
   {
     id: 1,
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80",
+    image: "c015.png",
     price: "$148,000",
     title: "Oakwood Honor Estates",
     address: "22462 Washington Street, ID 161032",
@@ -12,7 +12,7 @@ export const properties = [
   },
   {
     id: 2,
-    image: "https://images.unsplash.com/photo-1460518451285-97b6aa326961?auto=format&fit=crop&w=800&q=80",
+    image: "b1bd.png",
     price: "$132,000",
     title: "Willowbrook Grey Estate",
     address: "73082 Hens n Wells, Idaho, ID 78928",
@@ -23,7 +23,7 @@ export const properties = [
   },
   {
     id: 3,
-    image: "https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80",
+    image: "7738.png",
     price: "$123,000",
     title: "Timberland Interior Legacy",
     address: "6007 Seamy Gardens, Japan, JP 10550",
@@ -34,7 +34,7 @@ export const properties = [
   },
   {
     id: 4,
-    image: "https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80",
+    image: "ffcf0.png",
     price: "$160,000",
     title: "Cedar Ridge Residences",
     address: "7081 Lucia Brook, Japan, JP 10550",
@@ -45,7 +45,7 @@ export const properties = [
   },
   {
     id: 5,
-    image: "https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=800&q=80",
+    image: "fad0.png",
     price: "$115,000",
     title: "Blue Lagoon Villas",
     address: "19 Victory Lane, FL 34602",
@@ -56,7 +56,7 @@ export const properties = [
   },
   {
     id: 6,
-    image: "https://images.unsplash.com/photo-1505253716362-afaea1f8b4b8?auto=format&fit=crop&w=800&q=80",
+    image: "f001.png",
     price: "$240,000",
     title: "Palm Breeze House",
     address: "305 San Jose Blvd, CA 93421",

@@ -23,9 +23,9 @@ export default function LuxuriousPropertiesSection() {
           className="relative rounded-[24px] overflow-hidden shadow-lg"
         >
           <img
-            src="/7738.png"
+            src="/3cde.png"
             alt="Luxurious property"
-            className="object-cover w-full h-[500px]"
+            className="object-center w-full h-[600px]"
           />
           <div
             className="absolute bottom-4 left-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-full flex items-center px-4 py-2 gap-2 cursor-pointer transition hover:scale-105 active:scale-95"
