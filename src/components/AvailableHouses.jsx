@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import housesData from "./data/houses";
 import HouseCard from "./HouseCard";
@@ -6,16 +6,13 @@ import FilterSidebar from "./FilterSidebar";
 import SearchBar from "./SearchBar";
 import { Plus } from "lucide-react";
 
-// Utility to get filters from query parameters
 const getFiltersFromQuery = (locationSearch) => {
   const params = new URLSearchParams(locationSearch);
-  const filters = {
+  return {
     type: params.get("type") || "",
     location: params.get("location") || "",
     price: parseInt(params.get("price")) || null,
   };
-  console.log("📦 Extracted filters from URL:", filters);
-  return filters;
 };
 
 const AvailableHouses = () => {
@@ -23,12 +20,11 @@ const AvailableHouses = () => {
   const [visibleCount, setVisibleCount] = useState(9);
   const location = useLocation();
   const navigate = useNavigate();
+  const observerRef = useRef(null); // To hold the IntersectionObserver
+  const sentinelRef = useRef(null); // This is the element we'll watch
 
   const applyFilters = ({ type, location, price }) => {
-    console.log("🔍 Applying filters:", { type, location, price });
-
     const priceMargin = 10000;
-
     const result = housesData.filter((house) => {
       const matchesType = type ? house.type === type : true;
       const matchesLocation = location ? house.location === location : true;
@@ -36,11 +32,9 @@ const AvailableHouses = () => {
         price !== null
           ? house.price >= price - priceMargin && house.price <= price + priceMargin
           : true;
-
       return matchesType && matchesLocation && matchesPrice;
     });
 
-    console.log("🏘️ Filtered results:", result);
     setFiltered(result);
     setVisibleCount(9);
   };
@@ -50,10 +44,29 @@ const AvailableHouses = () => {
     applyFilters(filters);
   }, [location.search]);
 
-  const loadMore = () => {
-    console.log("📥 Loading more houses...");
-    setVisibleCount((prev) => prev + 9);
-  };
+  // Infinite scroll logic
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => {
+          if (prev < filtered.length) {
+            return prev + 9; // Load 9 more houses
+          }
+          return prev;
+        });
+      }
+    });
+
+    if (sentinelRef.current) {
+      observerRef.current.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [filtered]);
 
   return (
     <section className="p-4 bg-white min-h-screen text-black">
@@ -75,13 +88,12 @@ const AvailableHouses = () => {
           className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
         >
           <Plus size={18} />
-          Add House
+          Add Listing
         </button>
       </div>
 
       {/* Filters and Listings */}
       <div className="flex flex-col md:flex-row gap-6 mt-6">
-        {/* Left sidebar with max width */}
         <aside className="md:w-1/4 max-w-sm">
           <FilterSidebar
             onFilterChange={applyFilters}
@@ -89,7 +101,6 @@ const AvailableHouses = () => {
           />
         </aside>
 
-        {/* Right content area */}
         <main className="md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filtered.length === 0 ? (
             <div className="col-span-full text-center text-gray-500 text-lg">
@@ -103,17 +114,8 @@ const AvailableHouses = () => {
         </main>
       </div>
 
-      {/* Load More Button */}
-      {visibleCount < filtered.length && (
-        <div className="text-center mt-8">
-          <button
-            onClick={loadMore}
-            className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-          >
-            Load More
-          </button>
-        </div>
-      )}
+      {/* Sentinel for infinite scroll */}
+      <div ref={sentinelRef} className="h-10"></div>
     </section>
   );
 };

@@ -52,6 +52,8 @@ const App = () => {
       <Route path="/product-page" element={<ProductPage />} />
       <Route path="/dashboard" element={<Dashboardpage />} />
       <Route path="/uploadPage" element={<HouseUploadPage />} />
+      <Route path="/upload" element={<div>hello world</div>} />
+
 
       {/* 🧱 Public User-Facing Layout */}
       <Route path="/" element={<Layout />}>

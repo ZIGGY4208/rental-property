@@ -15,41 +15,91 @@ const HouseUploadPage = () => {
 
   const fileInputRef = useRef(null);
 
+  // Log initial states
+  console.log("Initial State:", {
+    title,
+    houseType,
+    location,
+    description,
+    rent,
+    photos,
+    toast,
+  });
+
   const handleDrop = (e) => {
     e.preventDefault();
     const files = Array.from(e.dataTransfer.files);
+    console.log("Dropped files:", files);
     handleFileUpload(files);
   };
 
-  const handleFileUpload = (files) => {
-    const urls = files.map(file => URL.createObjectURL(file));
-    setPhotos((prev) => [...prev, ...urls]);
-  };
+const handleFileUpload = (files, replace = false) => {
+  console.log("handleFileUpload called with:", files);
+
+  // Only create URLs for actual File objects
+  const newFiles = files.map((file) => {
+    if (file instanceof File) {
+      return {
+        id: `${Date.now()}-${file.name}`,
+        type: file.type.startsWith("video") ? "video" : "image",
+        url: URL.createObjectURL(file),
+      };
+    } else {
+      // Already processed object
+      return file;
+    }
+  });
+
+  const updatedPhotos = replace ? newFiles : [...photos, ...newFiles];
+  console.log("Updated photos state:", updatedPhotos);
+  setPhotos(updatedPhotos);
+};
+
 
   const removePhoto = (idx) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+    console.log("Removing photo at index:", idx);
+    setPhotos((prev) => {
+      const updated = prev.filter((_, i) => i !== idx);
+      console.log("Photos after removal:", updated);
+      return updated;
+    });
   };
 
   const showToast = (message, type = "success") => {
+    console.log("Toast triggered:", { message, type });
     setToast({ message, type });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => {
+      console.log("Toast cleared");
+      setToast(null);
+    }, 3000);
   };
 
   const isFormValid = () => {
-    return (
+    const valid =
       title.trim() &&
       houseType.trim() &&
       location.trim() &&
       description.trim() &&
       rent.trim() &&
       !isNaN(rent) &&
-      photos.length > 0
-    );
+      photos.length > 0;
+    console.log("Form validation result:", valid, {
+      title,
+      houseType,
+      location,
+      description,
+      rent,
+      photosLength: photos.length,
+    });
+    return valid;
   };
 
   const handleUploadHouse = () => {
+    console.log("Upload button clicked");
+
     if (!isFormValid()) {
       showToast("Please complete all fields correctly.", "error");
+      console.log("Upload aborted: form not valid");
       return;
     }
 
@@ -62,10 +112,12 @@ const HouseUploadPage = () => {
       photos,
     };
 
+    console.log("House data being saved:", houseData);
     saveHouseToStorage(houseData);
     showToast("🏡 House listing saved!");
 
     // Reset form
+    console.log("Resetting form to empty");
     setTitle("");
     setHouseType("");
     setLocation("");
@@ -78,9 +130,11 @@ const HouseUploadPage = () => {
     <div className="h-screen flex p-6 flex-col relative">
       {/* Toast */}
       {toast && (
-        <div className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded shadow text-white z-50 ${
-          toast.type === "error" ? "bg-red-600" : "bg-green-600"
-        }`}>
+        <div
+          className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded shadow text-white z-50 ${
+            toast.type === "error" ? "bg-red-600" : "bg-green-600"
+          }`}
+        >
           {toast.message}
         </div>
       )}
@@ -95,15 +149,30 @@ const HouseUploadPage = () => {
             <HouseDetailsForm
               {...{
                 title,
-                setTitle,
+                setTitle: (val) => {
+                  console.log("Title changed:", val);
+                  setTitle(val);
+                },
                 houseType,
-                setHouseType,
+                setHouseType: (val) => {
+                  console.log("House type changed:", val);
+                  setHouseType(val);
+                },
                 location,
-                setLocation,
+                setLocation: (val) => {
+                  console.log("Location changed:", val);
+                  setLocation(val);
+                },
                 description,
-                setDescription,
+                setDescription: (val) => {
+                  console.log("Description changed:", val);
+                  setDescription(val);
+                },
                 rent,
-                setRent,
+                setRent: (val) => {
+                  console.log("Rent changed:", val);
+                  setRent(val);
+                },
               }}
             />
           </div>
