@@ -1,6 +1,5 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-
 import Layout from './layout/Layout';
 import HomePage from "./components/pages/HomePage";
 import Landlords from "./components/pages/Landlords";
@@ -9,28 +8,23 @@ import Location from "./components/pages/Location";
 import Contact from "./components/pages/Contact";
 import StatsSection from "./components/StatsSection";
 import HouseDetailsPage from "./components/HouseDetailsPage";
-
 import AuthPage from "./components/pages/AuthPage";
 import ProfileSetup from "./components/pages/ProfileSetup";
 import ProductPage from "./components/ProductPage";
 import Dashboardpage from "./components/pages/DashboardPage";
 import AdminLayout from "./layout/AdminLayout";
 import { adminRoutes } from "./components/routes/adminRoutes";
-import HouseUploadPage from "./components/pages/HouseUploadPage";
-
-
-import AdminLogin from "./components/dashboardComponents/AdminLogin";
-
-// import AdminLogin from "./components/pages/AdminLogin";
+import AdminLogin from "./components/pages/AdminLogin";
 import ProtectedRoute from "./components/dashboardComponents/ProtectedRoute";
+import HouseUploadPage from "./components/pages/HouseUploadPage";
 
 const App = () => {
   return (
     <Routes>
-      {/* 🔐 Admin Login (outside of layout) */}
+      {/* Admin Login */}
       <Route path="/Admin" element={<AdminLogin />} />
 
-      {/* 🔐 Protected Admin Routes under AdminLayout */}
+      {/* Protected Admin Routes */}
       <Route
         path="/Admin/*"
         element={
@@ -39,23 +33,22 @@ const App = () => {
           </ProtectedRoute>
         }
       >
-        {adminRoutes.map((route) => {
-          const Component = route.component;
-          const path = route.path.replace('/Admin/', '');
-          return <Route key={path} path={path} element={<Component />} />;
-        })}
+        {/* Admin sidebar routes */}
+        {adminRoutes.map((route) => (
+          <Route key={route.path} path={route.path} element={<route.component />} />
+        ))}
+
+        {/* Standalone route for uploading houses */}
+        <Route path="houses/upload" element={<HouseUploadPage />} />
       </Route>
 
-      {/* 🔓 Public Auth Pages */}
+      {/* Public Auth Pages */}
       <Route path="/auth" element={<AuthPage />} />
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/product-page" element={<ProductPage />} />
       <Route path="/dashboard" element={<Dashboardpage />} />
-      <Route path="/uploadPage" element={<HouseUploadPage />} />
-      <Route path="/upload" element={<div>hello world</div>} />
 
-
-      {/* 🧱 Public User-Facing Layout */}
+      {/* Public User-Facing Layout */}
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="landlords" element={<Landlords />} />

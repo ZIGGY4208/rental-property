@@ -16,15 +16,7 @@ const HouseUploadPage = () => {
   const fileInputRef = useRef(null);
 
   // Log initial states
-  console.log("Initial State:", {
-    title,
-    houseType,
-    location,
-    description,
-    rent,
-    photos,
-    toast,
-  });
+  console.log("Initial State:", { title, houseType, location, description, rent, photos, toast });
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -33,45 +25,35 @@ const HouseUploadPage = () => {
     handleFileUpload(files);
   };
 
-const handleFileUpload = (files, replace = false) => {
-  console.log("handleFileUpload called with:", files);
+  const handleFileUpload = (files, replace = false) => {
+    console.log("handleFileUpload called with:", files);
 
-  // Only create URLs for actual File objects
-  const newFiles = files.map((file) => {
-    if (file instanceof File) {
-      return {
-        id: `${Date.now()}-${file.name}`,
-        type: file.type.startsWith("video") ? "video" : "image",
-        url: URL.createObjectURL(file),
-      };
-    } else {
-      // Already processed object
-      return file;
-    }
-  });
+    const newFiles = files.map((file) => {
+      if (file instanceof File) {
+        return {
+          id: `${Date.now()}-${file.name}`,
+          type: file.type.startsWith("video") ? "video" : "image",
+          url: URL.createObjectURL(file),
+        };
+      } else {
+        return file;
+      }
+    });
 
-  const updatedPhotos = replace ? newFiles : [...photos, ...newFiles];
-  console.log("Updated photos state:", updatedPhotos);
-  setPhotos(updatedPhotos);
-};
-
+    const updatedPhotos = replace ? newFiles : [...photos, ...newFiles];
+    console.log("Updated photos state:", updatedPhotos);
+    setPhotos(updatedPhotos);
+  };
 
   const removePhoto = (idx) => {
     console.log("Removing photo at index:", idx);
-    setPhotos((prev) => {
-      const updated = prev.filter((_, i) => i !== idx);
-      console.log("Photos after removal:", updated);
-      return updated;
-    });
+    setPhotos((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const showToast = (message, type = "success") => {
     console.log("Toast triggered:", { message, type });
     setToast({ message, type });
-    setTimeout(() => {
-      console.log("Toast cleared");
-      setToast(null);
-    }, 3000);
+    setTimeout(() => setToast(null), 3000);
   };
 
   const isFormValid = () => {
@@ -83,14 +65,7 @@ const handleFileUpload = (files, replace = false) => {
       rent.trim() &&
       !isNaN(rent) &&
       photos.length > 0;
-    console.log("Form validation result:", valid, {
-      title,
-      houseType,
-      location,
-      description,
-      rent,
-      photosLength: photos.length,
-    });
+    console.log("Form validation result:", valid);
     return valid;
   };
 
@@ -99,25 +74,15 @@ const handleFileUpload = (files, replace = false) => {
 
     if (!isFormValid()) {
       showToast("Please complete all fields correctly.", "error");
-      console.log("Upload aborted: form not valid");
       return;
     }
 
-    const houseData = {
-      title,
-      houseType,
-      location,
-      description,
-      rent,
-      photos,
-    };
-
+    const houseData = { title, houseType, location, description, rent, photos };
     console.log("House data being saved:", houseData);
     saveHouseToStorage(houseData);
     showToast("🏡 House listing saved!");
 
     // Reset form
-    console.log("Resetting form to empty");
     setTitle("");
     setHouseType("");
     setLocation("");
@@ -127,7 +92,7 @@ const handleFileUpload = (files, replace = false) => {
   };
 
   return (
-    <div className="h-screen flex p-6 flex-col relative">
+    <div className="h-screen flex p-6 flex-col relative bg-gray-100">
       {/* Toast */}
       {toast && (
         <div
@@ -143,8 +108,16 @@ const handleFileUpload = (files, replace = false) => {
         <HouseUploadHeader onUpload={handleUploadHouse} />
       </div>
 
-      <div className="flex-1 overflow-hidden p-6 bg-[#fafbfc]">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full">
+      <div className="flex-1 overflow-hidden p-6 bg-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full bg-gray-100">
+          {/* Left column: Images & Amenities */}
+          <div className="h-full overflow-auto">
+            <HouseImagesAndAmenities
+              {...{ photos, handleDrop, fileInputRef, handleFileUpload, removePhoto }}
+            />
+          </div>
+
+          {/* Right column: House Details Form */}
           <div className="h-full overflow-auto">
             <HouseDetailsForm
               {...{
@@ -173,17 +146,6 @@ const handleFileUpload = (files, replace = false) => {
                   console.log("Rent changed:", val);
                   setRent(val);
                 },
-              }}
-            />
-          </div>
-          <div className="h-full overflow-auto">
-            <HouseImagesAndAmenities
-              {...{
-                photos,
-                handleDrop,
-                fileInputRef,
-                handleFileUpload,
-                removePhoto,
               }}
             />
           </div>

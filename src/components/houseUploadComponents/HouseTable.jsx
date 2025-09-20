@@ -20,7 +20,7 @@ const columns = [
   { id: "actions", label: "Actions", minWidth: 80 },
 ];
 
-export default function HouseTableMui({ houses }) {
+export default function HouseTable({ houses }) {
   const navigate = useNavigate(); // ✅ Setup navigation
   const getInitialRowsPerPage = () => {
     const screenHeight = window.innerHeight;
@@ -90,10 +90,12 @@ export default function HouseTableMui({ houses }) {
           variant="contained"
           startIcon={<AddIcon />}
           sx={{ bgcolor: "#6b21a8", "&:hover": { bgcolor: "#581c87" } }}
-          onClick={() => navigate("/Admin/HouseUpload/uploadPage")} // ✅ Route to upload page
+          onClick={() => navigate("upload")} // relative to /Admin/houses
+ // ✅ fixed path
         >
           Upload House
         </Button>
+
       </Stack>
 
       <TableContainer sx={{ maxHeight: 900 }}>
