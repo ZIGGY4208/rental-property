@@ -1,8 +1,9 @@
 import React from 'react'
+import EmployeeTable from '../EmployeeTable'
 
 const AdminProfile = () => {
   return (
-    <div>AdminProfile</div>
+    <div><EmployeeTable/></div>
   )
 }
 

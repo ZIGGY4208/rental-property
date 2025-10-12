@@ -21,32 +21,32 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  // ===== Handle file selection =====
+  // ===== Handle file selection (multiple) =====
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     const newFiles = files.map((file) => ({
-      id: `${Date.now()}-${file.name}`,
+      id: crypto.randomUUID(),
       type: file.type.startsWith("video") ? "video" : "image",
       url: URL.createObjectURL(file),
     }));
     handleFileUpload(newFiles);
+    e.target.value = ""; // reset input to allow re-uploading same files
   };
 
-  // ===== Handle drop zone =====
+  // ===== Handle drag-and-drop =====
   const handleDropZone = (e) => {
     e.preventDefault();
     setIsDragging(false);
-
     const files = Array.from(e.dataTransfer.files);
     const newFiles = files.map((file) => ({
-      id: `${Date.now()}-${file.name}`,
+      id: crypto.randomUUID(),
       type: file.type.startsWith("video") ? "video" : "image",
       url: URL.createObjectURL(file),
     }));
     handleFileUpload(newFiles);
   };
 
-  // ===== Handle sorting =====
+  // ===== Handle drag sorting =====
   const handleDragEnd = (event) => {
     const { active, over } = event;
     if (!over) return;
@@ -58,7 +58,7 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
     }
   };
 
-  // ===== Sortable item =====
+  // ===== Sortable Item =====
   const SortableItem = ({ item, idx }) => {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
       useSortable({ id: item.id });
@@ -69,34 +69,34 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
       opacity: isDragging ? 0.5 : 1,
     };
 
+    const handlePreviewClick = () => setPreviewIndex(idx);
+
     return (
       <div
         ref={setNodeRef}
         style={style}
         {...attributes}
         {...listeners}
-        className="relative group"
+        className="relative group cursor-pointer"
+        onClick={handlePreviewClick}
       >
         {item.type === "image" ? (
           <img
             src={item.url}
             alt={`House ${idx}`}
-            className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-lg cursor-pointer"
-            onClick={() => setPreviewIndex(idx)}
-            title="Click to enlarge"
+            className="w-full h-24 sm:h-32 md:h-36 lg:h-40 xl:h-44 object-cover rounded-lg"
           />
         ) : (
           <video
             src={item.url}
-            controls
-            className="w-full h-32 sm:h-40 md:h-48 object-cover rounded-lg cursor-pointer"
-            onClick={() => setPreviewIndex(idx)}
+            className="w-full h-24 sm:h-32 md:h-36 lg:h-40 xl:h-44 object-cover rounded-lg"
+            controls={false}
           />
         )}
 
-        {/* Action buttons */}
-        <div className="absolute top-2 right-2 flex space-x-2 opacity-0 group-hover:opacity-100 transition">
-          {/* Delete button - stop drag */}
+        {/* Action Buttons */}
+        <div className="absolute top-1 right-1 flex space-x-1 sm:space-x-2
+                        opacity-100 sm:opacity-0 group-hover:opacity-100 transition">
           <div onPointerDown={(e) => e.stopPropagation()}>
             <button
               type="button"
@@ -106,13 +106,10 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
               <X className="w-5 h-5 sm:w-4 sm:h-4" />
             </button>
           </div>
-
-          {/* Preview button - stop drag */}
           <div onPointerDown={(e) => e.stopPropagation()}>
             <button
               type="button"
               className="bg-gray-700 text-white rounded-full p-2 sm:p-1.5"
-              onClick={() => setPreviewIndex(idx)}
               title="Preview"
             >
               <Eye className="w-5 h-5 sm:w-4 sm:h-4" />
@@ -125,9 +122,9 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
 
   return (
     <div>
-      {/* Drop zone */}
+      {/* Drop Zone */}
       <div
-        className={`w-full p-6 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors text-center ${
+        className={`w-full p-4 sm:p-6 md:p-8 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors text-center ${
           isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"
         }`}
         onDragOver={(e) => {
@@ -137,7 +134,7 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDropZone}
         onClick={() => document.getElementById("fileInput")?.click()}
-        style={{ minHeight: photos.length > 0 ? "80px" : "150px" }}
+        style={{ minHeight: photos.length > 0 ? "80px" : "160px" }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -166,7 +163,7 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
         />
       </div>
 
-      {/* Sortable thumbnails */}
+      {/* Sortable Thumbnails */}
       {photos.length > 0 && (
         <DndContext
           sensors={sensors}
@@ -174,7 +171,7 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
           onDragEnd={handleDragEnd}
         >
           <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 mt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mt-4">
               {photos.map((item, idx) => (
                 <SortableItem key={item.id} item={item} idx={idx} />
               ))}
@@ -183,7 +180,7 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
         </DndContext>
       )}
 
-      {/* Preview modal (images + videos) */}
+      {/* Preview Modal */}
       {previewIndex !== null && (
         <div
           className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"

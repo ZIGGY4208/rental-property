@@ -1,12 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
-import houses from "../data/houses";
 import HouseTable from "../houseUploadComponents/HouseTable";
+import { getAllHouses } from "../data/localStorageUtils"; // Make sure this function exists
 
 const HousesPage = () => {
+  const [houses, setHouses] = useState([]);
+
+  useEffect(() => {
+    const storedHouses = getAllHouses(); // Fetch from localStorage
+    setHouses(storedHouses || []);
+  }, []);
+
   return (
     <div className="p-6">
-      {/* Default content for /Admin/houses */}
+      {/* House table showing all stored houses */}
       <HouseTable houses={houses} />
 
       {/* Nested routes (like /Admin/houses/upload) will render here */}

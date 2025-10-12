@@ -1,13 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getUserByEmail,
-  saveUser,
-  setCurrentUser,
-} from "../data/localStorageUtils";
+import { getUserByEmail, saveUser, setCurrentUser } from "../data/localStorageUtils";
 import { AtSign, Lock, Eye, EyeOff, User } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
-import Switch from "react-switch";
 
 const AuthPage = () => {
   const [isRegistering, setIsRegistering] = useState(true);
@@ -15,7 +10,6 @@ const AuthPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -23,56 +17,38 @@ const AuthPage = () => {
 
     if (isRegistering) {
       const existing = getUserByEmail(email);
-      if (existing) {
-        toast.error("User already exists!");
-        return;
-      }
+      if (existing) return toast.error("User already exists!");
 
-      // Save user with full name
-      saveUser({ fullName, email, password, role: "", profile: null });
-      toast.success("Registration successful! Please log in.");
-      setIsRegistering(false); // Switch to login view
-      // Don't navigate yet — let the user log in manually
+      saveUser({ fullName, email, password, fullyRegistered: false });
+      setCurrentUser(email);
+
+      toast.success("Registration successful! Complete your profile.");
+      navigate("/profile-setup");
     } else {
       const existing = getUserByEmail(email);
-      if (!existing || existing.password !== password) {
-        toast.error("Invalid credentials");
-        return;
-      }
+      if (!existing) return toast.error("Email not found!");
+      if (existing.password !== password) return toast.error("Incorrect password!");
+
       setCurrentUser(email);
       toast.success("Login successful!");
-      navigate("/"); // Only navigate on successful login
+      navigate(existing.fullyRegistered ? "/" : "/profile-setup");
     }
   };
 
-  const bgClass = darkMode ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-800";
-  const inputClass = darkMode ? "bg-gray-800 text-white placeholder-gray-400" : "bg-gray-100 text-gray-700 placeholder-gray-400";
+  const bgClass = "bg-gray-100 text-gray-800";
+  const inputClass = "bg-gray-100 text-gray-700 placeholder-gray-400";
 
   return (
     <div className={`min-h-screen ${bgClass} flex items-center justify-center px-4`}>
       <Toaster position="top-center" />
-
       <form
         onSubmit={handleSubmit}
-        className="animate-fade-in-up bg-white dark:bg-gray-800 w-full max-w-md rounded-2xl shadow-xl p-8 space-y-6"
+        className="animate-fade-in-up bg-white w-full max-w-md rounded-2xl shadow-xl p-8 space-y-6"
       >
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold text-purple-700">
-            {isRegistering ? "Create an Account" : "Welcome Back!"}
-          </h2>
-          <Switch
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            offColor="#ccc"
-            onColor="#6b21a8"
-            uncheckedIcon={false}
-            checkedIcon={false}
-            height={20}
-            width={40}
-          />
-        </div>
+        <h2 className="text-2xl font-bold text-purple-700 mb-4">
+          {isRegistering ? "Create an Account" : "Welcome Back!"}
+        </h2>
 
-        {/* Full Name (only in registration) */}
         {isRegistering && (
           <div className="relative">
             <input
@@ -87,7 +63,6 @@ const AuthPage = () => {
           </div>
         )}
 
-        {/* Email Input */}
         <div className="relative">
           <input
             type="email"
@@ -100,7 +75,6 @@ const AuthPage = () => {
           <AtSign className="absolute left-4 top-1/2 -translate-y-1/2 text-purple-500" />
         </div>
 
-        {/* Password Input */}
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
@@ -120,7 +94,6 @@ const AuthPage = () => {
           </button>
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
@@ -128,7 +101,6 @@ const AuthPage = () => {
           {isRegistering ? "Register" : "Login"}
         </button>
 
-        {/* Toggle login/register */}
         <p className="text-sm text-center">
           {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
@@ -139,24 +111,8 @@ const AuthPage = () => {
             {isRegistering ? "Log In" : "Register"}
           </button>
         </p>
-
-        {/* Mock Social Logins */}
-        <div className="mt-6">
-          <div className="text-center text-sm mb-3 text-gray-400">Or login with</div>
-          <div className="flex gap-4">
-            <button className="flex-1 border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition">
-              <img src="https://img.icons8.com/color/16/google-logo.png" className="inline mr-2" />
-              Google
-            </button>
-            <button className="flex-1 border border-gray-300 rounded-lg py-2 hover:bg-gray-50 transition">
-              <img src="https://img.icons8.com/color/16/facebook-new.png" className="inline mr-2" />
-              Facebook
-            </button>
-          </div>
-        </div>
       </form>
 
-      {/* Animation styles */}
       <style>
         {`
           @keyframes fade-in-up {

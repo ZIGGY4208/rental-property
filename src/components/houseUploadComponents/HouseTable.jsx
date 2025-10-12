@@ -127,7 +127,7 @@ export default function HouseTable({ houses }) {
                 <TableCell>{house.type}</TableCell>
                 <TableCell>{house.location}</TableCell>
                 <TableCell align="right" sx={{ pr: 6 }}>
-                  {house.price.toLocaleString()}
+                  {house.rent.toLocaleString()}
                 </TableCell>
                 <TableCell>
                   <Chip
@@ -145,7 +145,7 @@ export default function HouseTable({ houses }) {
                 <TableCell sx={{ pl: 4 }}>
                   <Stack direction="row" spacing={1} alignItems="center">
                     <Avatar
-                      src={house.postedBy.profilePic}
+                      src={house.postedBy?.profilePic}
                       sx={{ width: 24, height: 24 }}
                     />
                     <span className="text-black">{house.postedBy.name}</span>

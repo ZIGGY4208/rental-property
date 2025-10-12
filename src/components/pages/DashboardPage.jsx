@@ -24,7 +24,7 @@ export default function DashboardPage() {
         <TopbarSection />
         <main className="flex-1 p-8 bg-gray-50">
           {/* Top row */}
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6 h-[40%]">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
             {/* Admin Cards Section */}
             <div className="lg:col-span-1 bg-white rounded-xl p-6 shadow flex flex-col justify-center items-start">
               <AdminCardList />
@@ -32,7 +32,14 @@ export default function DashboardPage() {
 
             {/* Stat Cards */}
             <div className="lg:col-span-3">
-              <div className="grid grid-cols-3 grid-rows-2 gap-4 h-full">
+              <div
+                className="
+                  grid 
+                  grid-cols-2 grid-rows-3 
+                  md:grid-cols-3 md:grid-rows-2
+                  gap-4
+                "
+              >
                 <StatCard
                   title="Properties Listed"
                   value="124"
@@ -86,12 +93,15 @@ export default function DashboardPage() {
           </div>
 
           {/* Bottom row */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 p-4 h-[50%]">
-            <div className="lg:col-span-2">
-              <SurveyChart />
-            </div>
-            <div className="bg-white rounded-xl shadow ">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8 p-4">
+            {/* Calendar first on mobile, second on large */}
+            <div className="bg-white rounded-xl shadow order-1 lg:order-2 min-h-[300px] lg:min-h-full">
               <Calendar />
+            </div>
+
+            {/* SurveyChart second on mobile, first on large */}
+            <div className="lg:col-span-2 order-2 lg:order-1 min-h-[300px] lg:min-h-full">
+              <SurveyChart />
             </div>
           </div>
         </main>

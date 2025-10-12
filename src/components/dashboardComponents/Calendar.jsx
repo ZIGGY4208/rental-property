@@ -28,20 +28,20 @@ const Calendar = () => {
   ];
 
   return (
-    <div className="bg-white rounded-xl p-6 shadow-lg min-h-full">
+    <div className="bg-white rounded-xl p-4 sm:p-6 shadow-lg w-full">
       <div className="flex items-center justify-between mb-3">
         <button onClick={prevMonth} className="text-gray-500 hover:text-purple-600">
-          <ChevronLeft />
+          <ChevronLeft size={20} />
         </button>
-        <span className="font-semibold text-lg text-gray-700">
+        <span className="font-semibold text-base sm:text-lg text-gray-700">
           {date.toLocaleString("default", { month: "long" })} {currentYear}
         </span>
         <button onClick={nextMonth} className="text-gray-500 hover:text-purple-600">
-          <ChevronRight />
+          <ChevronRight size={20} />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-xs text-gray-400 text-center mb-2">
+      <div className="grid grid-cols-7 gap-1 text-xs sm:text-sm text-gray-400 text-center mb-2">
         {daysOfWeek.map((day) => (
           <div key={day} className="font-medium">
             {day}
@@ -49,11 +49,11 @@ const Calendar = () => {
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1 text-sm text-center ">
+      <div className="grid grid-cols-7 gap-1 text-xs sm:text-sm text-center">
         {daysArray.map((day, index) => (
           <div
             key={index}
-            className={`h-8 w-8 flex items-center  p-6 ml-4 justify-center rounded-full transition ${
+            className={`flex items-center justify-center rounded-full transition h-8 w-8 sm:h-10 sm:w-10 mx-auto ${
               day === today.getDate() &&
               currentMonth === today.getMonth() &&
               currentYear === today.getFullYear()

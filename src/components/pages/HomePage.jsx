@@ -46,3 +46,9 @@ const HomePage = () => {
 };
 
 export default HomePage;
+
+
+{/* Hide this on mobile and tablet screens */}
+        {/* <div className="hidden md:block">
+          {user && user.profile ? <ProfileDisplay /> : <RegisterBTN />}
+        </div> */}

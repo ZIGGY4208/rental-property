@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import HouseUploadHeader from "../houseUploadComponents/HouseUploadHeader";
 import HouseDetailsForm from "../houseUploadComponents/HouseDetailsForm";
 import HouseImagesAndAmenities from "../houseUploadComponents/HouseImagesAndAmenities";
-import { saveHouseToStorage } from "../data/localStorageUtils";
+import { saveHouse } from "../data/localStorageUtils";
 
 const HouseUploadPage = () => {
   const [title, setTitle] = useState("");
@@ -15,19 +15,8 @@ const HouseUploadPage = () => {
 
   const fileInputRef = useRef(null);
 
-  // Log initial states
-  console.log("Initial State:", { title, houseType, location, description, rent, photos, toast });
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const files = Array.from(e.dataTransfer.files);
-    console.log("Dropped files:", files);
-    handleFileUpload(files);
-  };
-
+  // Handle files uploaded via drag/drop or file input
   const handleFileUpload = (files, replace = false) => {
-    console.log("handleFileUpload called with:", files);
-
     const newFiles = files.map((file) => {
       if (file instanceof File) {
         return {
@@ -39,48 +28,44 @@ const HouseUploadPage = () => {
         return file;
       }
     });
-
     const updatedPhotos = replace ? newFiles : [...photos, ...newFiles];
-    console.log("Updated photos state:", updatedPhotos);
     setPhotos(updatedPhotos);
   };
 
+  // Remove a photo/video from the list
   const removePhoto = (idx) => {
-    console.log("Removing photo at index:", idx);
     setPhotos((prev) => prev.filter((_, i) => i !== idx));
   };
 
+  // Show temporary toast messages
   const showToast = (message, type = "success") => {
-    console.log("Toast triggered:", { message, type });
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
+  // Validate form before saving
   const isFormValid = () => {
-    const valid =
+    return (
       title.trim() &&
       houseType.trim() &&
       location.trim() &&
       description.trim() &&
       rent.trim() &&
       !isNaN(rent) &&
-      photos.length > 0;
-    console.log("Form validation result:", valid);
-    return valid;
+      photos.length > 0
+    );
   };
 
+  // Handle house upload using CRUD saveHouse
   const handleUploadHouse = () => {
-    console.log("Upload button clicked");
-
     if (!isFormValid()) {
       showToast("Please complete all fields correctly.", "error");
       return;
     }
 
     const houseData = { title, houseType, location, description, rent, photos };
-    console.log("House data being saved:", houseData);
-    saveHouseToStorage(houseData);
-    showToast("🏡 House listing saved!");
+    const savedHouse = saveHouse(houseData); // Save house with unique ID
+    showToast(`🏡 House listing saved! ID: ${savedHouse.id}`);
 
     // Reset form
     setTitle("");
@@ -104,49 +89,36 @@ const HouseUploadPage = () => {
         </div>
       )}
 
+      {/* Header */}
       <div className="shrink-0">
         <HouseUploadHeader onUpload={handleUploadHouse} />
       </div>
 
+      {/* Main content */}
       <div className="flex-1 overflow-hidden p-6 bg-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full bg-gray-100">
           {/* Left column: Images & Amenities */}
           <div className="h-full overflow-auto">
             <HouseImagesAndAmenities
-              {...{ photos, handleDrop, fileInputRef, handleFileUpload, removePhoto }}
+              photos={photos}
+              handleFileUpload={handleFileUpload}
+              removePhoto={removePhoto}
             />
           </div>
 
           {/* Right column: House Details Form */}
           <div className="h-full overflow-auto">
             <HouseDetailsForm
-              {...{
-                title,
-                setTitle: (val) => {
-                  console.log("Title changed:", val);
-                  setTitle(val);
-                },
-                houseType,
-                setHouseType: (val) => {
-                  console.log("House type changed:", val);
-                  setHouseType(val);
-                },
-                location,
-                setLocation: (val) => {
-                  console.log("Location changed:", val);
-                  setLocation(val);
-                },
-                description,
-                setDescription: (val) => {
-                  console.log("Description changed:", val);
-                  setDescription(val);
-                },
-                rent,
-                setRent: (val) => {
-                  console.log("Rent changed:", val);
-                  setRent(val);
-                },
-              }}
+              title={title}
+              setTitle={setTitle}
+              houseType={houseType}
+              setHouseType={setHouseType}
+              location={location}
+              setLocation={setLocation}
+              description={description}
+              setDescription={setDescription}
+              rent={rent}
+              setRent={setRent}
             />
           </div>
         </div>

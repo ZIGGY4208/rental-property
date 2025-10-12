@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { Menu, XCircle } from "lucide-react"; // Hamburger and close icons
+import { Menu, XCircle } from "lucide-react";
+import RegisterBTN from "./RegisterBTN"; // mobile button
 
 const navItems = [
   { name: "Home", path: "/" },
@@ -9,16 +10,15 @@ const navItems = [
   { name: "Contact Us", path: "/contact" },
 ];
 
-const Navbar = () => {
+const Navbar = ({ currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu = () => {
-    console.log("Hamburger menu toggled:", isOpen ? "CLOSE" : "OPEN");
-    setIsOpen((prev) => !prev);
-  };
+  console.log("Navbar → currentUser prop:", currentUser);
+
+  const toggleMenu = () => setIsOpen((prev) => !prev);
 
   return (
-    <nav className="flex items-center justify-between px-6 py-4 relative z-50">
+    <nav className="flex items-center justify-between relative z-50">
       {/* Desktop Navigation */}
       <ul className="hidden md:flex items-center space-x-14 text-base font-semibold">
         {navItems.map((item) => (
@@ -39,7 +39,7 @@ const Navbar = () => {
         ))}
       </ul>
 
-      {/* Hamburger Icon (Only visible when closed) */}
+      {/* Hamburger Icon (mobile only) */}
       {!isOpen && (
         <button
           className="md:hidden z-[9999]"
@@ -57,15 +57,18 @@ const Navbar = () => {
         }`}
       >
         <div className="flex flex-col h-full p-6">
-          {/* Close button inside menu */}
+          {/* Close button */}
           <div className="flex justify-end mb-6">
             <button onClick={toggleMenu} aria-label="Close Menu">
-              <XCircle size={24} className="text-gray-700 hover:text-purple-700" />
+              <XCircle
+                size={24}
+                className="text-gray-700 hover:text-purple-700"
+              />
             </button>
           </div>
 
           {/* Mobile Nav Links */}
-          <ul className="flex flex-col space-y-6 text-base font-semibold">
+          <ul className="flex flex-col space-y-6 text-base font-semibold flex-grow">
             {navItems.map((item) => (
               <li key={item.name}>
                 <NavLink
@@ -83,12 +86,39 @@ const Navbar = () => {
                 </NavLink>
               </li>
             ))}
+
+            {/* Mobile-only Register/Login button */}
+            {!currentUser && (
+              <li className="mt-4">
+                <RegisterBTN />
+              </li>
+            )}
           </ul>
 
-          {/* Footer text inside drawer */}
-          <div className="mt-auto pt-10 text-sm text-gray-400">
-            &copy; {new Date().getFullYear()} Part Home
-          </div>
+          {/* ✅ User Profile Pill at bottom */}
+          {currentUser && (
+            <button
+              onClick={() => console.log("Profile clicked!")}
+              className="flex items-center gap-3 mt-auto px-4 py-2 bg-purple-50 hover:bg-purple-100 rounded-full transition-colors duration-200 w-full"
+            >
+              {currentUser.profile?.profileImage ? (
+                <img
+                  src={currentUser.profile.profileImage}
+                  alt={currentUser.profile?.firstName}
+                  className="w-10 h-10 rounded-full object-cover border-2 border-purple-600"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold text-lg">
+                  {currentUser.profile?.firstName
+                    ? currentUser.profile.firstName.charAt(0).toUpperCase()
+                    : "U"}
+                </div>
+              )}
+              <span className="text-gray-800 font-medium">
+                {currentUser.profile?.firstName || "User"}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 

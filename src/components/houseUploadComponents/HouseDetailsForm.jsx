@@ -15,12 +15,12 @@ const HouseDetailsForm = ({
 }) => {
   return (
     <div
-      className={`w-full max-w-5xl mx-auto h-full flex flex-col bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8 ${className}`}
+      className={`w-full max-w-5xl mx-auto flex flex-col bg-white rounded-xl shadow-md p-4 sm:p-6 lg:p-8 h-auto ${className}`}
     >
-      {/* Responsive form container */}
+      {/* Form container grows automatically */}
       <div className="flex-1 flex flex-col gap-4 sm:gap-6 min-h-0 text-black">
-        {/* Grid layout: 1 col on mobile, 2 cols on sm+, flexible on lg+ */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+        {/* Grid layout: 1 col on mobile, 2 on sm+, 3 on lg */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {/* House Title */}
           <div className="flex flex-col">
             <label className="block text-sm font-medium mb-1 text-black">
@@ -61,7 +61,7 @@ const HouseDetailsForm = ({
           </div>
 
           {/* Rent Price */}
-          <div className="flex flex-col">
+          <div className="flex flex-col sm:col-span-2 lg:col-span-1">
             <label className="block text-sm font-medium mb-1 text-black">
               Rent Price
             </label>
@@ -76,12 +76,12 @@ const HouseDetailsForm = ({
         </div>
 
         {/* Description full width */}
-        <div className="flex flex-col">
+        <div className="flex flex-col mt-4">
           <label className="block text-sm font-medium mb-1 text-black">
             Description
           </label>
           <textarea
-            className="w-full border border-purple-600 rounded-md px-3 py-2 resize-none focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm h-28 sm:h-32 lg:h-36"
+            className="w-full border border-purple-600 rounded-md px-3 py-2 resize-none focus:outline-none focus:border-purple-700 text-black placeholder:text-gray-400 text-sm min-h-[7rem] sm:min-h-[8rem] lg:min-h-[10rem]"
             value={description}
             onChange={(e) => setDescription(e.target.value.slice(0, 1000))}
             placeholder="Provide a short description of the house"

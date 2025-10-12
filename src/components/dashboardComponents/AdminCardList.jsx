@@ -33,15 +33,17 @@ const admins = [
 ];
 
 const AdminCard = ({ admin }) => (
-  <div className="bg-white rounded-xl shadow px-6 py-8 flex flex-col items-center text-center w-full transition duration-500 ease-in-out">
-    <span className="text-sm text-purple-600 font-semibold mb-1">Currently Active</span>
+  <div className="bg-white rounded-xl shadow px-4 py-6 sm:px-6 sm:py-8 flex flex-col items-center text-center w-full max-w-sm mx-auto transition duration-500 ease-in-out">
+    <span className="text-xs sm:text-sm text-purple-600 font-semibold mb-1">
+      Currently Active
+    </span>
     <span className="text-xs text-gray-400 mb-2">Posted from: {admin.location}</span>
     <img
       src={admin.image}
       alt={admin.name}
-      className="w-20 h-20 rounded-full object-cover mb-3"
+      className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover mb-3"
     />
-    <span className="font-semibold text-gray-700 text-base">{admin.name}</span>
+    <span className="font-semibold text-gray-700 text-sm sm:text-base">{admin.name}</span>
     <span className="text-xs text-gray-400 mb-1">{admin.role}</span>
     <span className="text-xs font-semibold text-gray-500">
       Responds between {admin.availability}
@@ -62,13 +64,13 @@ const AdminSlider = () => {
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="relative w-full px-6 max-w-lg mx-auto">
       {/* Arrows */}
       <button
         onClick={handlePrev}
-        className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 text-purple-600 hover:text-purple-800"
+        className="absolute left-2 sm:left-0 top-1/2 transform -translate-y-1/2 z-10 p-2 text-purple-600 hover:text-purple-800"
       >
-        <ChevronLeft size={28} />
+        <ChevronLeft size={24} />
       </button>
 
       <div className="overflow-hidden">
@@ -79,9 +81,9 @@ const AdminSlider = () => {
 
       <button
         onClick={handleNext}
-        className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 text-purple-600 hover:text-purple-800"
+        className="absolute right-2 sm:right-0 top-1/2 transform -translate-y-1/2 z-10 p-2 text-purple-600 hover:text-purple-800"
       >
-        <ChevronRight size={28} />
+        <ChevronRight size={24} />
       </button>
     </div>
   );

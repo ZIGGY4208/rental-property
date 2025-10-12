@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "../components/dashboardComponents/Sidebar";
 import { Menu } from "lucide-react";
 
-const AdminLayout = () => {
+const AdminLayout = ({ user = { name: "Dr. Norica", avatar: "/ai.jpg" } }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -30,16 +30,26 @@ const AdminLayout = () => {
 
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden">
-        {/* Mobile hamburger */}
+        {/* Mobile hamburger + profile */}
         <div className="md:hidden p-4 bg-white shadow flex items-center flex-shrink-0">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-md bg-gray-200 hover:bg-gray-300"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <h1 className="ml-4 font-semibold text-lg">Administration</h1>
-        </div>
+          {/* Left: Hamburger + title */}
+          <div className="flex items-center">
+            <button
+              onClick={() => setSidebarOpen(true)}
+              className="p-2 rounded-md bg-gray-200 hover:bg-gray-300"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h1 className="ml-4 font-semibold text-lg">Administration</h1>
+          </div>
+
+          {/* Right: profile image */}
+          <img
+            src={user.avatar}
+            alt={user.name}
+            className="w-9 h-9 rounded-full border-2 border-emerald-600 object-cover ml-auto"
+          />
+        </div>  
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">
