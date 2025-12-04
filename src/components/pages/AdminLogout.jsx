@@ -5,7 +5,7 @@ import { useAdminAuth } from "../data/useAdminAuth";
 import toast from "react-hot-toast";
 
 const AdminLogout = () => {
-  const { logout } = useAdminAuth();
+  const { logout } = useAdminAuth(); // ✅ uses admin-specific logout
   const navigate = useNavigate();
 
   const [showConfirm, setShowConfirm] = useState(false);
@@ -15,16 +15,17 @@ const AdminLogout = () => {
     setTimeout(() => setShowConfirm(true), 50);
   }, []);
 
+  // Confirm logout
   const handleConfirm = () => {
-    logout();
-
-    toast.success("Logged out successfully");
+    logout(); // ✅ only logs out admin
+    toast.success("Admin logged out successfully");
 
     setTimeout(() => {
       navigate("/", { replace: true });
-    }, 300); // Allow toast to show briefly before navigating
+    }, 300); // allow toast to show briefly before navigating
   };
 
+  // Cancel logout
   const handleCancel = () => {
     navigate("/Admin/dashboard");
   };

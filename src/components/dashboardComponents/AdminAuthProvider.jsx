@@ -1,35 +1,44 @@
 import React, { useState, useEffect } from "react";
-import AdminAuthContext from "../data/AdminAuthContext";
-import { getCurrentUser } from "../data/localStorageUtils"; // ✅ make sure path is correct
+import AdminAuthContext from "../data/AdminAuthContext"; 
+import { getUserByEmail, setCurrentAdmin, getCurrentAdmin } from "../data/localStorageUtils";
 
 export const AdminAuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // ✅ Check localStorage on load
+  // Check admin session on component mount
   useEffect(() => {
-    const user = getCurrentUser();
-    if (user && (user.role === "admin" || user.role === "superadmin")) {
+    const user = getCurrentAdmin(); // ✅ use separate admin key
+    if (!user) return;
+
+    const isAdmin =
+      user &&
+      (user.role === "superadmin" ||
+        user.role === "admin" ||
+        (user.profile && (user.profile.role === "superadmin" || user.profile.role === "admin")));
+
+    if (isAdmin) {
       setCurrentUser(user);
       setIsAuthenticated(true);
-      console.log("💡 Logged in as:", user.email);
+      console.log("💡 Admin logged in as:", user.email);
     } else {
+      localStorage.removeItem("currentAdmin"); // ✅ remove only admin key
       setCurrentUser(null);
       setIsAuthenticated(false);
     }
   }, []);
 
-  // ✅ Login (called from AdminLogin.jsx)
+  // Login function for admin/superadmin
   const login = (user) => {
-    localStorage.setItem("currentUser", JSON.stringify(user));
+    setCurrentAdmin(user.email); // ✅ set only admin key
     setCurrentUser(user);
     setIsAuthenticated(true);
-    console.log("✅ Logged in as:", user.email);
+    console.log("✅ Admin logged in as:", user.email);
   };
 
-  // ✅ Logout (clears data)
+  // Logout function for admin/superadmin
   const logout = () => {
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem("currentAdmin"); // ✅ remove only admin key
     setCurrentUser(null);
     setIsAuthenticated(false);
     console.log("🚪 Admin logged out");

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getUserByEmail, saveUser, setCurrentUser } from "../data/localStorageUtils";
+import { loginUserApi, registerUserApi, forgotPasswordApi } from "../api/auth";
 import { AtSign, Lock, Eye, EyeOff, User } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
+import GoogleLoginButton from "../GoogleLoginButton";
 
 const AuthPage = () => {
   const [isRegistering, setIsRegistering] = useState(true);
@@ -12,26 +13,46 @@ const AuthPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      if (isRegistering) {
+        // REGISTER
+        console.log("Registering user:", { fullName, email, password });
+        const res = await registerUserApi({ fullName, email, password });
+        console.log("Register response:", res.data);
 
-    if (isRegistering) {
-      const existing = getUserByEmail(email);
-      if (existing) return toast.error("User already exists!");
+        toast.success(res.data.message || "Registration successful!");
 
-      saveUser({ fullName, email, password, fullyRegistered: false });
-      setCurrentUser(email);
+        // Navigate to profile-setup and pass user data via state
+        navigate("/profile-setup", { state: { user: res.data.user, token: res.data.token } });
+      } else {
+        // LOGIN
+        console.log("Logging in user:", { email, password });
+        const res = await loginUserApi({ email, password });
+        console.log("Login response:", res.data);
 
-      toast.success("Registration successful! Complete your profile.");
-      navigate("/profile-setup");
-    } else {
-      const existing = getUserByEmail(email);
-      if (!existing) return toast.error("Email not found!");
-      if (existing.password !== password) return toast.error("Incorrect password!");
+        // Save token for session
+        localStorage.setItem("token", res.data.token);
 
-      setCurrentUser(email);
-      toast.success("Login successful!");
-      navigate(existing.fullyRegistered ? "/" : "/profile-setup");
+        toast.success(res.data.message || "Login successful!");
+        navigate("/"); // redirect home
+      }
+    } catch (error) {
+      console.error("Auth error:", error);
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) return toast.error("Please enter your email first");
+    try {
+      const res = await forgotPasswordApi(email);
+      toast.success(res.data.message || "Password reset email sent!");
+    } catch (error) {
+      const message = error.response?.data?.message || "Something went wrong";
+      toast.error(message);
     }
   };
 
@@ -101,6 +122,25 @@ const AuthPage = () => {
           {isRegistering ? "Register" : "Login"}
         </button>
 
+        {!isRegistering && (
+          <div className="text-right mt-2">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              className="text-sm text-purple-600 font-medium underline"
+            >
+              Forgot Password?
+            </button>
+          </div>
+        )}
+
+        <div className="relative flex items-center justify-center">
+          <hr className="w-full border-gray-300" />
+          <span className="absolute bg-white px-2 text-gray-500 text-sm">OR</span>
+        </div>
+
+        <GoogleLoginButton />
+
         <p className="text-sm text-center">
           {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
           <button
@@ -112,18 +152,6 @@ const AuthPage = () => {
           </button>
         </p>
       </form>
-
-      <style>
-        {`
-          @keyframes fade-in-up {
-            0% { opacity: 0; transform: translateY(40px); }
-            100% { opacity: 1; transform: translateY(0); }
-          }
-          .animate-fade-in-up {
-            animation: fade-in-up 0.6s ease-out both;
-          }
-        `}
-      </style>
     </div>
   );
 };

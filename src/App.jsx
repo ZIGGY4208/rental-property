@@ -17,6 +17,8 @@ import { adminRoutes } from "./components/routes/adminRoutes";
 import AdminLogin from "./components/pages/AdminLogin";
 import ProtectedRoute from "./components/dashboardComponents/ProtectedRoute";
 import HouseUploadPage from "./components/pages/HouseUploadPage";
+import OAuthSuccess from "./components/pages/OAuthSuccess";
+import ResetPasswordPage from "./components/pages/ResetPasswordPage";
 
 const App = () => {
   return (
@@ -47,6 +49,9 @@ const App = () => {
       <Route path="/profile-setup" element={<ProfileSetup />} />
       <Route path="/product-page" element={<ProductPage />} />
       <Route path="/dashboard" element={<Dashboardpage />} />
+      <Route path="/oauth-success" element={<OAuthSuccess />} />
+      <Route path="/reset-password/:token" element={<ResetPasswordPage/>} />
+
 
       {/* Public User-Facing Layout */}
       <Route path="/" element={<Layout />}>

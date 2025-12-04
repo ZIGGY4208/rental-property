@@ -1,4 +1,5 @@
-import { LayoutDashboard, Building2, User, LogOut } from "lucide-react";
+import { LayoutDashboard, Building2, User, Users, LogOut } from "lucide-react";
+
 
 // Pages
 import DashboardPage from "../pages/DashboardPage";
@@ -6,6 +7,7 @@ import HousesPage from "../pages/HousesPage";
 import AdminProfile from "../pages/AdminProfile";
 import AdminLogout from "../pages/AdminLogout";
 import HouseUploadPage from "../pages/HouseUploadPage";
+import UserAdminManager from "../pages/UserAdminManager";
 
 export const adminRoutes = [
   {
@@ -22,6 +24,15 @@ export const adminRoutes = [
     component: HousesPage, // Renders HouseTable
     section: "main",
   },
+
+    {
+    label: "Manage Users",
+    path: "Manage-user",
+    icon: Users,
+    component: UserAdminManager, // Renders HouseTable
+    section: "main",
+  },
+
   {
     label: "Profile",
     path: "profile",
