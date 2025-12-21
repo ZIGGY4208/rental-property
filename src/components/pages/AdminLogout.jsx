@@ -5,28 +5,36 @@ import { useAdminAuth } from "../data/useAdminAuth";
 import toast from "react-hot-toast";
 
 const AdminLogout = () => {
-  const { logout } = useAdminAuth(); // ✅ uses admin-specific logout
+  const { logout } = useAdminAuth();
   const navigate = useNavigate();
 
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Animate in
   useEffect(() => {
     setTimeout(() => setShowConfirm(true), 50);
   }, []);
 
-  // Confirm logout
   const handleConfirm = () => {
-    logout(); // ✅ only logs out admin
+    console.log("🚪 Logging out admin...");
+
+    // ✅ Remove JWT
+    localStorage.removeItem("habalink_admin_token");
+    console.log("🗑️ Removed habalink_admin_token");
+
+    // ✅ Call context logout
+    logout();
+    console.log("🎯 useAdminAuth().logout() executed");
+
     toast.success("Admin logged out successfully");
 
     setTimeout(() => {
+      console.log("🔄 Redirecting to homepage...");
       navigate("/", { replace: true });
-    }, 300); // allow toast to show briefly before navigating
+    }, 300);
   };
 
-  // Cancel logout
   const handleCancel = () => {
+    console.log("❌ Logout canceled, returning to dashboard");
     navigate("/Admin/dashboard");
   };
 

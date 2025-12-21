@@ -1,5 +1,11 @@
-import { LayoutDashboard, Building2, User, Users, LogOut } from "lucide-react";
-
+import {
+  LayoutDashboard,
+  Building2,
+  Upload,
+  User,
+  Users,
+  LogOut,
+} from "lucide-react";
 
 // Pages
 import DashboardPage from "../pages/DashboardPage";
@@ -8,6 +14,7 @@ import AdminProfile from "../pages/AdminProfile";
 import AdminLogout from "../pages/AdminLogout";
 import HouseUploadPage from "../pages/HouseUploadPage";
 import UserAdminManager from "../pages/UserAdminManager";
+import HouseUploadWrapper from "../houseUploadComponents/HouseUploadWrapper";
 
 export const adminRoutes = [
   {
@@ -16,29 +23,39 @@ export const adminRoutes = [
     icon: LayoutDashboard,
     component: DashboardPage,
     section: "main",
+    matchMode: "exact", // active only on /Admin/dashboard
   },
   {
     label: "Houses",
     path: "houses",
     icon: Building2,
-    component: HousesPage, // Renders HouseTable
+    component: HousesPage,
     section: "main",
+    matchMode: "exact", // active only on /Admin/houses
   },
-
-    {
+  {
+    label: "Upload House",
+    path: "upload", // changed to /Admin/upload for clarity
+    icon: Upload,
+    component: HouseUploadWrapper,
+    section: "main",
+    matchMode: "exact", // active only on /Admin/upload
+  },
+  {
     label: "Manage Users",
     path: "Manage-user",
     icon: Users,
-    component: UserAdminManager, // Renders HouseTable
+    component: UserAdminManager,
     section: "main",
+    matchMode: "parent", // active on /Admin/Manage-user and nested
   },
-
   {
     label: "Profile",
     path: "profile",
     icon: User,
     component: AdminProfile,
     section: "bottom",
+    matchMode: "exact", // active only on /Admin/profile
   },
   {
     label: "Logout",
@@ -46,5 +63,6 @@ export const adminRoutes = [
     icon: LogOut,
     component: AdminLogout,
     section: "bottom",
+    matchMode: "exact", // active only on /Admin/logout
   },
 ];

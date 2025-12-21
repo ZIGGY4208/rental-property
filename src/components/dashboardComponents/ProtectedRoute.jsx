@@ -1,22 +1,18 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
-import { useAdminAuth } from "../data/useAdminAuth"; // path is correct
+import { useAdminAuth } from "../data/useAdminAuth";
 
 const ProtectedRoute = ({ children }) => {
-  const { currentUser, isAuthenticated } = useAdminAuth();
+  const { isAuthenticated, currentUser, loading } = useAdminAuth();
 
-  // ✅ Check authentication and roles
-  const isAdmin =
-    currentUser &&
-    (currentUser.role === "admin" ||
-      currentUser.role === "superadmin" ||
-      (currentUser.profile && 
-       (currentUser.profile.role === "admin" || currentUser.profile.role === "superadmin")));
+  if (loading) return <div>Loading...</div>;
 
-  if (!isAuthenticated || !isAdmin) {
-    console.log("Access denied, not logged in or not an admin");
+  if (!isAuthenticated) return <Navigate to="/Admin" replace />;
+
+  const role = currentUser?.role;
+
+  if (role !== "admin" && role !== "superadmin")
     return <Navigate to="/Admin" replace />;
-  }
 
   return children;
 };

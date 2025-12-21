@@ -1,8 +1,10 @@
 import React, { useRef, useState } from "react";
+import axios from "axios";
 import HouseUploadHeader from "../houseUploadComponents/HouseUploadHeader";
 import HouseDetailsForm from "../houseUploadComponents/HouseDetailsForm";
+// import HouseImagesAndAmenities from "../houseUploadComponents/HouseImagesAndAmenities";
 import HouseImagesAndAmenities from "../houseUploadComponents/HouseImagesAndAmenities";
-import { saveHouse } from "../data/localStorageUtils";
+
 
 const HouseUploadPage = () => {
   const [title, setTitle] = useState("");
@@ -15,35 +17,38 @@ const HouseUploadPage = () => {
 
   const fileInputRef = useRef(null);
 
-  // Handle files uploaded via drag/drop or file input
+  /* ---------------------------------------------
+        HANDLE UPLOAD + ADD MEDIA
+  ---------------------------------------------- */
   const handleFileUpload = (files, replace = false) => {
-    const newFiles = files.map((file) => {
-      if (file instanceof File) {
-        return {
-          id: `${Date.now()}-${file.name}`,
-          type: file.type.startsWith("video") ? "video" : "image",
-          url: URL.createObjectURL(file),
-        };
-      } else {
-        return file;
-      }
-    });
-    const updatedPhotos = replace ? newFiles : [...photos, ...newFiles];
+    const updatedPhotos = replace ? files : [...photos, ...files];
     setPhotos(updatedPhotos);
   };
 
-  // Remove a photo/video from the list
-  const removePhoto = (idx) => {
-    setPhotos((prev) => prev.filter((_, i) => i !== idx));
+  /* ---------------------------------------------
+        REMOVE MEDIA (BY ID — FIXED!)
+  ---------------------------------------------- */
+  const removePhoto = (id) => {
+    const toRemove = photos.find((p) => p.id === id);
+
+    if (toRemove?.url?.startsWith("blob:")) {
+      URL.revokeObjectURL(toRemove.url);
+    }
+
+    setPhotos((prev) => prev.filter((p) => p.id !== id));
   };
 
-  // Show temporary toast messages
+  /* ---------------------------------------------
+          TOAST
+  ---------------------------------------------- */
   const showToast = (message, type = "success") => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
 
-  // Validate form before saving
+  /* ---------------------------------------------
+          VALIDATION
+  ---------------------------------------------- */
   const isFormValid = () => {
     return (
       title.trim() &&
@@ -52,33 +57,63 @@ const HouseUploadPage = () => {
       description.trim() &&
       rent.trim() &&
       !isNaN(rent) &&
-      photos.length > 0
+      photos.length > 0 &&
+      photos.every((p) => p.file)
     );
   };
 
-  // Handle house upload using CRUD saveHouse
-  const handleUploadHouse = () => {
+  /* ---------------------------------------------
+          FINAL SUBMIT
+  ---------------------------------------------- */
+  const handleUploadHouse = async () => {
     if (!isFormValid()) {
       showToast("Please complete all fields correctly.", "error");
       return;
     }
 
-    const houseData = { title, houseType, location, description, rent, photos };
-    const savedHouse = saveHouse(houseData); // Save house with unique ID
-    showToast(`🏡 House listing saved! ID: ${savedHouse.id}`);
+    try {
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("houseType", houseType);
+      formData.append("location", location);
+      formData.append("description", description);
+      formData.append("rent", rent);
 
-    // Reset form
-    setTitle("");
-    setHouseType("");
-    setLocation("");
-    setDescription("");
-    setRent("");
-    setPhotos([]);
+      photos.forEach((p) => {
+        if (p.file) {
+          formData.append("photos", p.file);
+        }
+      });
+
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post("/api/houses", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: token ? `Bearer ${token}` : undefined,
+        },
+      });
+
+      showToast(`🏡 House listing saved! ID: ${res.data._id}`);
+
+      photos.forEach(
+        (p) => p.url?.startsWith("blob:") && URL.revokeObjectURL(p.url)
+      );
+
+      setTitle("");
+      setHouseType("");
+      setLocation("");
+      setDescription("");
+      setRent("");
+      setPhotos([]);
+    } catch (err) {
+      console.error(err);
+      showToast(err?.response?.data?.message || "Upload failed", "error");
+    }
   };
 
   return (
     <div className="h-screen flex p-6 flex-col relative bg-gray-100">
-      {/* Toast */}
       {toast && (
         <div
           className={`absolute top-4 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded shadow text-white z-50 ${
@@ -89,15 +124,12 @@ const HouseUploadPage = () => {
         </div>
       )}
 
-      {/* Header */}
       <div className="shrink-0">
         <HouseUploadHeader onUpload={handleUploadHouse} />
       </div>
 
-      {/* Main content */}
       <div className="flex-1 overflow-hidden p-6 bg-gray-100">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 h-full bg-gray-100">
-          {/* Left column: Images & Amenities */}
           <div className="h-full overflow-auto">
             <HouseImagesAndAmenities
               photos={photos}
@@ -106,7 +138,6 @@ const HouseUploadPage = () => {
             />
           </div>
 
-          {/* Right column: House Details Form */}
           <div className="h-full overflow-auto">
             <HouseDetailsForm
               title={title}

@@ -84,18 +84,21 @@ export default function HouseTable({ houses }) {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden", p: 2, bgcolor: "#fff" }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <h2 className="text-black">Houses</h2>
-        <Button
+        {/* <Button
           variant="contained"
           startIcon={<AddIcon />}
           sx={{ bgcolor: "#6b21a8", "&:hover": { bgcolor: "#581c87" } }}
-          onClick={() => navigate("upload")} // relative to /Admin/houses
- // ✅ fixed path
+          onClick={() => navigate("/Admin/houses/upload")}
         >
           Upload House
-        </Button>
-
+        </Button> */}
       </Stack>
 
       <TableContainer sx={{ maxHeight: 900 }}>
@@ -178,28 +181,42 @@ export default function HouseTable({ houses }) {
       />
 
       {/* Menu */}
-      <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+      >
         <Tooltip title="Mark as Available" placement="left">
-          <MenuItem onClick={() => handleAction("Available")}>Available</MenuItem>
+          <MenuItem onClick={() => handleAction("Available")}>
+            Available
+          </MenuItem>
         </Tooltip>
         <Tooltip title="Mark as Unavailable" placement="left">
-          <MenuItem onClick={() => handleAction("Unavailable")}>Unavailable</MenuItem>
+          <MenuItem onClick={() => handleAction("Unavailable")}>
+            Unavailable
+          </MenuItem>
         </Tooltip>
         <Tooltip title="Delete this house" placement="left">
-          <MenuItem onClick={() => handleAction("Delete")} sx={{ color: "red" }}>
+          <MenuItem
+            onClick={() => handleAction("Delete")}
+            sx={{ color: "red" }}
+          >
             Delete
           </MenuItem>
         </Tooltip>
       </Menu>
 
       {/* Delete Confirmation Modal */}
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
-        <DialogTitle>
-          Are you sure you want to delete this house?
-        </DialogTitle>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
+        <DialogTitle>Are you sure you want to delete this house?</DialogTitle>
         <DialogActions>
           <Button onClick={() => setDeleteDialogOpen(false)}>Cancel</Button>
-          <Button color="error" onClick={confirmDelete}>Delete</Button>
+          <Button color="error" onClick={confirmDelete}>
+            Delete
+          </Button>
         </DialogActions>
       </Dialog>
     </Paper>

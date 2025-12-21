@@ -21,3 +21,52 @@
 ::-webkit-scrollbar-thumb:hover {
   background-color: #4b5563; /* Tailwind slate-600 */
 }
+
+/* Remove spacebar white border */
+video:focus {
+  outline: none !important;
+}
+
+/* Modal container fix */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Keep video/image centered and contained */
+.modal-content {
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Fix for phone-recorded media */
+.modal-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+/* Fix the X button position */
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 20px;
+  z-index: 10000;
+}

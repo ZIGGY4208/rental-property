@@ -14,19 +14,26 @@ const AdminLayout = ({ user = { name: "Dr. Norica", avatar: "/ai.jpg" } }) => {
       </div>
 
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
+      <div
+        className={`fixed inset-0 z-50 flex bg-black/50 transition-opacity duration-300 ${
+          sidebarOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        onClick={() => setSidebarOpen(false)}
+      >
         <div
-          className="fixed inset-0 z-50 flex bg-black/50"
-          onClick={() => setSidebarOpen(false)}
+          className={`absolute left-0 top-0 h-[100dvh] w-64 bg-white shadow-lg transform transition-transform duration-300 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
+          onClick={(e) => e.stopPropagation()}
         >
-          <div
-            className="absolute left-0 top-0 h-[100dvh] w-64 bg-white shadow-lg overflow-y-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Sidebar isMobile={true} />
+          {/* ✅ Added padding-top here for a little space at the top */}
+          <div className="">
+            <Sidebar isMobile={true} setMobileOpen={setSidebarOpen} />
           </div>
         </div>
-      )}
+      </div>
 
       {/* Main content */}
       <main className="flex-1 flex flex-col overflow-hidden">
@@ -49,7 +56,7 @@ const AdminLayout = ({ user = { name: "Dr. Norica", avatar: "/ai.jpg" } }) => {
             alt={user.name}
             className="w-9 h-9 rounded-full border-2 border-emerald-600 object-cover ml-auto"
           />
-        </div>  
+        </div>
 
         {/* Scrollable content */}
         <div className="flex-1 overflow-y-auto">

@@ -1,51 +1,65 @@
 import React, { useState, useEffect } from "react";
-import AdminAuthContext from "../data/AdminAuthContext"; 
-import { getUserByEmail, setCurrentAdmin, getCurrentAdmin } from "../data/localStorageUtils";
+import axios from "axios";
+import AdminAuthContext from "../data/AdminAuthContext";
+//import AdminAuthContext from "./AdminAuthContext";
 
 export const AdminAuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Check admin session on component mount
+  // 🔁 Load admin via backend when page reloads
   useEffect(() => {
-    const user = getCurrentAdmin(); // ✅ use separate admin key
-    if (!user) return;
-
-    const isAdmin =
-      user &&
-      (user.role === "superadmin" ||
-        user.role === "admin" ||
-        (user.profile && (user.profile.role === "superadmin" || user.profile.role === "admin")));
-
-    if (isAdmin) {
-      setCurrentUser(user);
-      setIsAuthenticated(true);
-      console.log("💡 Admin logged in as:", user.email);
-    } else {
-      localStorage.removeItem("currentAdmin"); // ✅ remove only admin key
-      setCurrentUser(null);
-      setIsAuthenticated(false);
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
     }
+
+    axios
+      .get("http://localhost:5000/api/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setCurrentUser(res.data.user);
+        setIsAuthenticated(true);
+      })
+      .catch(() => {
+        localStorage.removeItem("token");
+      })
+      .finally(() => setLoading(false));
   }, []);
 
-  // Login function for admin/superadmin
-  const login = (user) => {
-    setCurrentAdmin(user.email); // ✅ set only admin key
+  // Login admin using backend
+  const login = async (email, password) => {
+    const res = await axios.post("http://localhost:5000/api/super-admin/login", {
+      email,
+      password,
+    });
+
+    const { token, user } = res.data;
+
+    localStorage.setItem("token", token);
     setCurrentUser(user);
     setIsAuthenticated(true);
-    console.log("✅ Admin logged in as:", user.email);
   };
 
-  // Logout function for admin/superadmin
   const logout = () => {
-    localStorage.removeItem("currentAdmin"); // ✅ remove only admin key
+    localStorage.removeItem("token");
     setCurrentUser(null);
     setIsAuthenticated(false);
-    console.log("🚪 Admin logged out");
   };
 
   return (
-    <AdminAuthContext.Provider value={{ currentUser, isAuthenticated, login, logout }}>
+    <AdminAuthContext.Provider
+      value={{
+        currentUser,
+        isAuthenticated,
+        loading,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AdminAuthContext.Provider>
   );

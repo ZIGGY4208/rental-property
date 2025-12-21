@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// src/components/houseUploadComponents/HouseImagesAndAmenities.jsx
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   DndContext,
   closestCenter,
@@ -15,53 +16,125 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { X, Eye } from "lucide-react";
 
-const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
+const uid = () =>
+  (typeof crypto !== "undefined" && crypto.randomUUID && crypto.randomUUID()) ||
+  `id-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+
+const HouseImagesAndAmenities = ({
+  photos = [],
+  handleFileUpload,
+  removePhoto,
+}) => {
   const [isDragging, setIsDragging] = useState(false);
-  const [previewIndex, setPreviewIndex] = useState(null);
+  const [previewId, setPreviewId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [modalType, setModalType] = useState(null);
+  const [modalSrc, setModalSrc] = useState(null);
+  const fileInputRef = useRef(null);
+  const modalVideoRef = useRef(null);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
-  // ===== Handle file selection (multiple) =====
-  const handleFileChange = (e) => {
-    const files = Array.from(e.target.files);
+  const findById = useCallback(
+    (id) => photos.find((p) => p.id === id),
+    [photos]
+  );
+
+  // ---------------- File upload ----------------
+  const handleFiles = (files) => {
     const newFiles = files.map((file) => ({
-      id: crypto.randomUUID(),
+      id: uid(),
+      file,
       type: file.type.startsWith("video") ? "video" : "image",
       url: URL.createObjectURL(file),
     }));
-    handleFileUpload(newFiles);
-    e.target.value = ""; // reset input to allow re-uploading same files
+    handleFileUpload(newFiles, false);
   };
 
-  // ===== Handle drag-and-drop =====
-  const handleDropZone = (e) => {
+  const onFileInputChange = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    handleFiles(files);
+    e.target.value = "";
+  };
+
+  const onDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = Array.from(e.dataTransfer.files);
-    const newFiles = files.map((file) => ({
-      id: crypto.randomUUID(),
-      type: file.type.startsWith("video") ? "video" : "image",
-      url: URL.createObjectURL(file),
-    }));
-    handleFileUpload(newFiles);
+    const files = Array.from(e.dataTransfer?.files || []);
+    if (!files.length) return;
+    handleFiles(files);
   };
 
-  // ===== Handle drag sorting =====
-  const handleDragEnd = (event) => {
+  // ---------------- Drag & reorder ----------------
+  const onDragEnd = (event) => {
     const { active, over } = event;
-    if (!over) return;
-    if (active.id !== over.id) {
-      const oldIndex = photos.findIndex((p) => p.id === active.id);
-      const newIndex = photos.findIndex((p) => p.id === over.id);
-      const newPhotos = arrayMove(photos, oldIndex, newIndex);
-      handleFileUpload(newPhotos, true);
-    }
+    if (!over || !active || active.id === over.id) return;
+    const oldIndex = photos.findIndex((p) => p.id === active.id);
+    const newIndex = photos.findIndex((p) => p.id === over.id);
+    const newOrder = arrayMove(photos, oldIndex, newIndex);
+    handleFileUpload(newOrder, true);
   };
 
-  // ===== Sortable Item =====
-  const SortableItem = ({ item, idx }) => {
-    const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-      useSortable({ id: item.id });
+  // ---------------- Preview modal ----------------
+  const openPreview = (item) => {
+    setPreviewId(item.id);
+    setModalSrc(item.url);
+    setModalType(item.type);
+    setShowModal(true);
+  };
+
+  const closePreview = () => {
+    setPreviewId(null);
+    setModalSrc(null);
+    setModalType(null);
+    setShowModal(false);
+  };
+
+  // ---------------- Delete ----------------
+  const onDelete = (id) => {
+    removePhoto(id);
+    if (previewId === id) closePreview();
+  };
+
+  // ---------------- Keyboard support ----------------
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (!showModal) return;
+
+      // Spacebar play/pause video
+      if (
+        e.code === "Space" &&
+        modalType === "video" &&
+        modalVideoRef.current
+      ) {
+        e.preventDefault();
+        const video = modalVideoRef.current;
+        if (video.paused) video.play();
+        else video.pause();
+      }
+
+      // Escape closes modal
+      if (e.code === "Escape") {
+        e.preventDefault();
+        closePreview();
+      }
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [showModal, modalType]);
+
+  // ---------------- Sortable Thumbnail ----------------
+  const SortableThumbnail = ({ item }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+      isDragging,
+    } = useSortable({ id: item.id });
 
     const style = {
       transform: CSS.Transform.toString(transform),
@@ -69,52 +142,63 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
       opacity: isDragging ? 0.5 : 1,
     };
 
-    const handlePreviewClick = () => setPreviewIndex(idx);
-
     return (
       <div
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...listeners}
         className="relative group cursor-pointer"
-        onClick={handlePreviewClick}
       >
         {item.type === "image" ? (
           <img
             src={item.url}
-            alt={`House ${idx}`}
-            className="w-full h-24 sm:h-32 md:h-36 lg:h-40 xl:h-44 object-cover rounded-lg"
+            alt="thumbnail"
+            className="w-full h-28 object-cover rounded-lg"
+            onClick={() => openPreview(item)}
           />
         ) : (
           <video
             src={item.url}
-            className="w-full h-24 sm:h-32 md:h-36 lg:h-40 xl:h-44 object-cover rounded-lg"
-            controls={false}
+            className="w-full h-28 object-cover rounded-lg bg-black"
+            muted
+            preload="metadata"
+            playsInline
+            onClick={() => openPreview(item)}
           />
         )}
 
-        {/* Action Buttons */}
-        <div className="absolute top-1 right-1 flex space-x-1 sm:space-x-2
-                        opacity-100 sm:opacity-0 group-hover:opacity-100 transition">
-          <div onPointerDown={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="bg-red-600 text-white rounded-full p-2 sm:p-1.5"
-              onClick={() => removePhoto(idx)}
-            >
-              <X className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
-          <div onPointerDown={(e) => e.stopPropagation()}>
-            <button
-              type="button"
-              className="bg-gray-700 text-white rounded-full p-2 sm:p-1.5"
-              title="Preview"
-            >
-              <Eye className="w-5 h-5 sm:w-4 sm:h-4" />
-            </button>
-          </div>
+        {/* Drag handle */}
+        <div
+          {...listeners}
+          className="absolute left-1 top-1 bg-white/80 rounded p-1 text-xs cursor-grab"
+          title="Drag to reorder"
+          onClick={(e) => e.stopPropagation()}
+        >
+          ≡
+        </div>
+
+        {/* Action buttons */}
+        <div className="absolute top-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(item.id);
+            }}
+            className="bg-red-600 text-white rounded-full p-1.5"
+            aria-label="Delete"
+          >
+            <X className="w-4 h-4" />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openPreview(item);
+            }}
+            className="bg-gray-700 text-white rounded-full p-1.5"
+            aria-label="Preview"
+          >
+            <Eye className="w-4 h-4" />
+          </button>
         </div>
       </div>
     );
@@ -122,9 +206,9 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
 
   return (
     <div>
-      {/* Drop Zone */}
+      {/* Dropzone */}
       <div
-        className={`w-full p-4 sm:p-6 md:p-8 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition-colors text-center ${
+        className={`w-full p-6 border-2 border-dashed rounded-lg flex flex-col items-center justify-center cursor-pointer transition text-center ${
           isDragging ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"
         }`}
         onDragOver={(e) => {
@@ -132,48 +216,36 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
           setIsDragging(true);
         }}
         onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDropZone}
-        onClick={() => document.getElementById("fileInput")?.click()}
-        style={{ minHeight: photos.length > 0 ? "80px" : "160px" }}
+        onDrop={onDrop}
+        onClick={() => fileInputRef.current?.click?.()}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-10 w-10 text-gray-400 mb-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 16v4h16v-4M12 12V4m0 0L8 8m4-4l4 4"
-          />
-        </svg>
-        <p className="text-gray-600 text-sm sm:text-base">
-          Drag & drop images/videos here, or click to upload
+        <p className="text-gray-600">
+          Drag & drop images/videos here or click to upload
         </p>
         <input
-          id="fileInput"
+          ref={fileInputRef}
           type="file"
           multiple
           accept="image/*,video/*"
           className="hidden"
-          onChange={handleFileChange}
+          onChange={onFileInputChange}
         />
       </div>
 
-      {/* Sortable Thumbnails */}
+      {/* Thumbnails */}
       {photos.length > 0 && (
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+          onDragEnd={onDragEnd}
         >
-          <SortableContext items={photos.map((p) => p.id)} strategy={rectSortingStrategy}>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3 md:gap-4 mt-4">
-              {photos.map((item, idx) => (
-                <SortableItem key={item.id} item={item} idx={idx} />
+          <SortableContext
+            items={photos.map((p) => p.id)}
+            strategy={rectSortingStrategy}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-4">
+              {photos.map((item) => (
+                <SortableThumbnail key={item.id} item={item} />
               ))}
             </div>
           </SortableContext>
@@ -181,24 +253,35 @@ const HouseImagesAndAmenities = ({ photos, handleFileUpload, removePhoto }) => {
       )}
 
       {/* Preview Modal */}
-      {previewIndex !== null && (
+      {showModal && (
         <div
-          className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
-          onClick={() => setPreviewIndex(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={closePreview}
         >
-          <div className="max-h-[85vh] max-w-[95vw]">
-            {photos[previewIndex]?.type === "image" ? (
+          <div
+            className="relative max-h-[85vh] max-w-[95vw]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Close X button */}
+            <button
+              onClick={closePreview}
+              className="absolute top-2 right-2 bg-gray-700 text-white rounded-full p-2 z-50 hover:bg-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {modalType === "image" ? (
               <img
-                src={photos[previewIndex].url}
+                src={modalSrc}
                 alt="Preview"
-                className="max-h-[85vh] max-w-[95vw] rounded-lg mx-auto"
+                className="max-h-[85vh] max-w-[95vw] mx-auto rounded-lg"
               />
             ) : (
               <video
-                src={photos[previewIndex].url}
+                ref={modalVideoRef}
+                src={modalSrc}
                 controls
-                autoPlay
-                className="max-h-[85vh] max-w-[95vw] rounded-lg mx-auto"
+                className="max-h-[85vh] max-w-[95vw] mx-auto rounded-lg bg-black"
               />
             )}
           </div>
