@@ -8,7 +8,7 @@ const ProfileDisplay = () => {
   const defaultAvatar = "/ai.jpg"; // relative to public folder
 
   return (
-    <header className="hidden md:flex justify-between items-center px-6 py-4 text-gray-500 text-2xl">
+    <header className="hidden lg:flex justify-between items-center px-6 py-4 text-gray-500 text-2xl  ">
       {user?.profile && (
         <div className="flex items-center gap-3">
           <img

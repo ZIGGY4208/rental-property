@@ -1,28 +1,33 @@
-import React, { useState } from "react"; // Import React and useState
+import React, { useState } from "react";
 
-// Sidebar component that allows filtering by type, location, and price
 const FilterSidebar = ({ onFilterChange }) => {
-  const [type, setType] = useState(""); // House type state
-  const [location, setLocation] = useState(""); // Location state
-  const [minPrice, setMinPrice] = useState(""); // Minimum price
-  const [maxPrice, setMaxPrice] = useState(""); // Maximum price
+  const [type, setType] = useState("");
+  const [location, setLocation] = useState("");
+  const [price, setPrice] = useState("");
 
-  // Applies selected filters and passes to parent component
-  const handleApply = () => {
+  const handleClear = () => {
+    setType("");
+    setLocation("");
+    setPrice("");
+    onFilterChange({ type: "", location: "", price: null });
+  };
+
+  const triggerFilter = (filters) => {
     onFilterChange({
-      type,
-      location,
-      minPrice: parseInt(minPrice) || 0,
-      maxPrice: parseInt(maxPrice) || Infinity,
+      ...filters,
+      price: filters.price ? parseInt(filters.price) : null,
     });
   };
 
   return (
     <div className="space-y-4 text-black">
-      {/* Dropdown to filter by house type */}
       <select
         value={type}
-        onChange={(e) => setType(e.target.value)}
+        onChange={(e) => {
+          const val = e.target.value;
+          setType(val);
+          triggerFilter({ type: val, location, price });
+        }}
         className="w-full p-2 border border-gray-300 bg-white text-black rounded"
       >
         <option value="">All Types</option>
@@ -34,10 +39,13 @@ const FilterSidebar = ({ onFilterChange }) => {
         <option value="Shared Apartment">Shared Apartment</option>
       </select>
 
-      {/* Dropdown to filter by location */}
       <select
         value={location}
-        onChange={(e) => setLocation(e.target.value)}
+        onChange={(e) => {
+          const val = e.target.value;
+          setLocation(val);
+          triggerFilter({ type, location: val, price });
+        }}
         className="w-full p-2 border border-gray-300 bg-white text-black rounded"
       >
         <option value="">All Locations</option>
@@ -51,33 +59,28 @@ const FilterSidebar = ({ onFilterChange }) => {
         <option value="Wotutu">Wotutu</option>
       </select>
 
-      {/* Input for minimum price */}
       <input
         type="number"
-        placeholder="Min Price"
-        value={minPrice}
-        onChange={(e) => setMinPrice(e.target.value)}
+        placeholder="Enter Price"
+        value={price}
+        onChange={(e) => {
+          const val = e.target.value;
+          setPrice(val);
+          triggerFilter({ type, location, price: val });
+        }}
         className="w-full p-2 border border-gray-300 bg-white text-black rounded"
       />
 
-      {/* Input for maximum price */}
-      <input
-        type="number"
-        placeholder="Max Price"
-        value={maxPrice}
-        onChange={(e) => setMaxPrice(e.target.value)}
-        className="w-full p-2 border border-gray-300 bg-white text-black rounded"
-      />
-
-      {/* Apply filter button */}
-      <button
-        onClick={handleApply}
-        className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-      >
-        Apply Filters
-      </button>
+      <div className="flex gap-2">
+        <button
+          onClick={handleClear}
+          className="flex-1 bg-gray-200 text-black px-4 py-2 rounded hover:bg-gray-300"
+        >
+          Clear
+        </button>
+      </div>
     </div>
   );
 };
 
-export default FilterSidebar; // Export component
+export default FilterSidebar;

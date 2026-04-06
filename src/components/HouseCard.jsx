@@ -13,10 +13,10 @@ const HouseCard = ({ house }) => {
       onClick={handleClick}
       className="bg-white text-black shadow rounded-lg overflow-hidden p-4 hover:shadow-md transition cursor-pointer"
     >
-      {/* House Image */}
+      {/* House Image with Lazy Loading */}
       <img
         src={house.image}
-        alt={`${house.type} in ${house.location}`}
+        alt={`${house.type} in ${house.location}`}  // <-- Native lazy loading
         className="w-full h-40 object-cover rounded mb-3"
       />
 
@@ -28,7 +28,7 @@ const HouseCard = ({ house }) => {
 
       {/* Price */}
       <p className="text-purple-600 font-semibold">
-        FCFA {house.price.toLocaleString()}
+        FCFA {house.price.toLocaleString()} <span>/Month</span>
       </p>
 
       {/* Poster Info */}
@@ -36,6 +36,7 @@ const HouseCard = ({ house }) => {
         <img
           src={house.postedBy?.profilePic}
           alt={house.postedBy?.name}
+          loading="lazy"  // <-- Lazy load profile picture too
           className="w-6 h-6 rounded-full object-cover"
         />
         <div className="text-xs text-gray-500">

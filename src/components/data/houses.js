@@ -13,42 +13,12 @@ const locationCoordinates = {
 };
 
 const landlords = [
-  {
-    name: "Mr. Bobe",
-    profilePic: "/images/users/user1.jpg",
-    rating: 4.5,
-    totalReviews: 12,
-  },
-  {
-    name: "Madam Sarah",
-    profilePic: "/images/users/user2.jpg",
-    rating: 4.8,
-    totalReviews: 20,
-  },
-  {
-    name: "Landlord Mike",
-    profilePic: "/images/users/user3.jpg",
-    rating: 4.3,
-    totalReviews: 8,
-  },
-  {
-    name: "Auntie Lucy",
-    profilePic: "/images/users/user4.jpg",
-    rating: 4.9,
-    totalReviews: 15,
-  },
-  {
-    name: "Mr. Fon",
-    profilePic: "/images/users/user5.jpg",
-    rating: 4.2,
-    totalReviews: 10,
-  },
-  {
-    name: "Uncle Tabi",
-    profilePic: "/images/users/user6.jpg",
-    rating: 4.7,
-    totalReviews: 18,
-  },
+  { name: "Mr. Bobe", profilePic: "ai.jpg", rating: 4.5, totalReviews: 12 },
+  { name: "Madam Sarah", profilePic: "ai.jpg", rating: 4.8, totalReviews: 20 },
+  { name: "Musa Mike", profilePic: "ai.jpg", rating: 4.3, totalReviews: 8 },
+  { name: "Madam Lucy", profilePic: "ai.jpg", rating: 4.9, totalReviews: 15 },
+  { name: "Mr. Fon", profilePic: "ai.jpg", rating: 4.2, totalReviews: 10 },
+  { name: "Mr Tabi", profilePic: "ai.jpg", rating: 4.7, totalReviews: 18 },
 ];
 
 const imagePaths = [
@@ -102,19 +72,27 @@ const inspectionChecklist = {
 
 const description = `This house is located in a calm and secured neighborhood of Buea. It's ideal for students, workers or visitors who want a clean and accessible place to stay without stress.`;
 
+const longDescription = `This property offers a peaceful environment ideal for relaxation and productivity. The compound is safe, well-fenced, and the neighbors are friendly. 
+It’s 5 minutes walk from local transport and has easy access to shops, schools, and health centers. The structure is well maintained, the plumbing and power supply are reliable.`;
+
 const houses = Array.from({ length: 50 }, (_, index) => {
   const landlord = landlords[Math.floor(Math.random() * landlords.length)];
   const location = locations[Math.floor(Math.random() * locations.length)];
+  const shuffledImages = imagePaths.sort(() => 0.5 - Math.random());
+  const mainImage = shuffledImages[0];
+  const gallery = shuffledImages.slice(0, 4);
 
   return {
     id: index + 1,
     type: houseTypes[Math.floor(Math.random() * houseTypes.length)],
     location,
-    coordinates: locationCoordinates[location], // ✅ Coordinates added
+    coordinates: locationCoordinates[location],
     price: Math.floor(Math.random() * 150_000 + 50_000),
     postedBy: landlord,
-    image: imagePaths[Math.floor(Math.random() * imagePaths.length)],
+    image: mainImage,
+    gallery,
     description,
+    longDescription,
     amenities: inspectionChecklist,
   };
 });

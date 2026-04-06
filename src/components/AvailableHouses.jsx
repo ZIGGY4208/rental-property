@@ -1,72 +1,123 @@
-import React, { useState } from "react"; // Import React and useState hook
-import housesData from "./data/houses"; // Import the dummy house data
-import HouseCard from "./HouseCard"; // Component to display each house
-import FilterSidebar from "./FilterSidebar"; // Sidebar filter component
-import SearchBar from "./SearchBar"; // Top search bar component
+import React, { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import housesData from "./data/houses";
+import HouseCard from "./HouseCard";
+import FilterSidebar from "./FilterSidebar";
+import SearchBar from "./SearchBar";
+import { Plus } from "lucide-react";
 
-// Main component to display and filter available houses
+const getFiltersFromQuery = (locationSearch) => {
+  const params = new URLSearchParams(locationSearch);
+  return {
+    type: params.get("type") || "",
+    location: params.get("location") || "",
+    price: parseInt(params.get("price")) || null,
+  };
+};
+
 const AvailableHouses = () => {
-  const [filtered, setFiltered] = useState(housesData); // Stores filtered house list
-  const [visibleCount, setVisibleCount] = useState(9); // Number of visible houses
+  const [filtered, setFiltered] = useState(housesData);
+  const [visibleCount, setVisibleCount] = useState(9);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const observerRef = useRef(null); // To hold the IntersectionObserver
+  const sentinelRef = useRef(null); // This is the element we'll watch
 
-  // Function to filter houses based on filters or keyword search
-  const applyFilters = ({ type, location, minPrice, maxPrice, keyword }) => {
+  const applyFilters = ({ type, location, price }) => {
+    const priceMargin = 10000;
     const result = housesData.filter((house) => {
-      const matchesType = type ? house.type === type : true; // Filter by type
-      const matchesLocation = location ? house.location === location : true; // Filter by location
-      const matchesPrice = house.price >= minPrice && house.price <= maxPrice; // Filter by price range
-      const matchesKeyword = keyword
-        ? `${house.type} ${house.location} ${house.postedBy}`.toLowerCase().includes(keyword.toLowerCase()) // Keyword search
-        : true;
-
-      return matchesType && matchesLocation && matchesPrice && matchesKeyword; // All filters must pass
+      const matchesType = type ? house.type === type : true;
+      const matchesLocation = location ? house.location === location : true;
+      const matchesPrice =
+        price !== null
+          ? house.price >= price - priceMargin && house.price <= price + priceMargin
+          : true;
+      return matchesType && matchesLocation && matchesPrice;
     });
 
-    setFiltered(result); // Update filtered houses
-    setVisibleCount(9); // Reset visible count when filters are applied
+    setFiltered(result);
+    setVisibleCount(9);
   };
 
-  // Function to show more houses when "Load More" is clicked
-  const loadMore = () => {
-    setVisibleCount((prev) => prev + 9); // Increase visible count by 9
-  };
+  useEffect(() => {
+    const filters = getFiltersFromQuery(location.search);
+    applyFilters(filters);
+  }, [location.search]);
+
+  // Infinite scroll logic
+  useEffect(() => {
+    if (observerRef.current) observerRef.current.disconnect();
+
+    observerRef.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setVisibleCount((prev) => {
+          if (prev < filtered.length) {
+            return prev + 9; // Load 9 more houses
+          }
+          return prev;
+        });
+      }
+    });
+
+    if (sentinelRef.current) {
+      observerRef.current.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (observerRef.current) observerRef.current.disconnect();
+    };
+  }, [filtered]);
 
   return (
     <section className="p-4 bg-white min-h-screen text-black">
-      {/* Top search bar */}
-      <SearchBar
-        onSearch={(keyword) =>
-          applyFilters({ type: '', location: '', minPrice: 0, maxPrice: Infinity, keyword })
-        }
-      />
+      {/* Top search bar and Add House button */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+        <SearchBar
+          onSearch={(keyword) =>
+            applyFilters({
+              type: "",
+              location: "",
+              price: null,
+              keyword,
+            })
+          }
+        />
 
+        <button
+          onClick={() => navigate("/Admin")}
+          className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition"
+        >
+          <Plus size={18} />
+          Add Listing
+        </button>
+      </div>
+
+      {/* Filters and Listings */}
       <div className="flex flex-col md:flex-row gap-6 mt-6">
-        {/* Left sidebar with filters */}
-        <aside className="md:w-1/4">
-          <FilterSidebar onFilterChange={applyFilters} />
+        <aside className="md:w-1/4 max-w-sm">
+          <FilterSidebar
+            onFilterChange={applyFilters}
+            initialFilters={getFiltersFromQuery(location.search)}
+          />
         </aside>
 
-        {/* House results on the right */}
         <main className="md:w-3/4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.slice(0, visibleCount).map((house) => (
-            <HouseCard key={house.id} house={house} />
-          ))}
+          {filtered.length === 0 ? (
+            <div className="col-span-full text-center text-gray-500 text-lg">
+              😢 No houses match your search. Try adjusting the filters.
+            </div>
+          ) : (
+            filtered.slice(0, visibleCount).map((house) => (
+              <HouseCard key={house.id} house={house} />
+            ))
+          )}
         </main>
       </div>
 
-      {/* Load More Button */}
-      {visibleCount < filtered.length && (
-        <div className="text-center mt-8">
-          <button
-            onClick={loadMore}
-            className="px-6 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition"
-          >
-            Load More
-          </button>
-        </div>
-      )}
+      {/* Sentinel for infinite scroll */}
+      <div ref={sentinelRef} className="h-10"></div>
     </section>
   );
 };
 
-export default AvailableHouses; // Export component
+export default AvailableHouses;

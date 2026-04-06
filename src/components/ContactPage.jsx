@@ -4,6 +4,7 @@ import ContactForm from "./ContactForm";
 import ContactInfo from "./ContactInfo";
 import OfficeLocations from "./OfficeLocations";
 import ContactHeroSection from "./ContactHeroSection";
+import FeedbackForm from "./FeedbackForm";
 
 const ContactPage = () => {
   const location = useLocation();
@@ -32,16 +33,17 @@ const ContactPage = () => {
         </div>
       )} */}
 
-      <div ref={formRef}>
+      {/* <div ref={formRef}> */}
         {/* Pass defaultSubject to pre-fill the subject input */}
-        <ContactForm
+        {/* <ContactForm
           defaultSubject={
             fromHouse
               ? `Inquiry about ${fromHouse.type} in ${fromHouse.location}`
               : ""
           }
         />
-      </div>
+      </div> */}
+      <FeedbackForm/>
 
       <ContactInfo />
       <OfficeLocations />
