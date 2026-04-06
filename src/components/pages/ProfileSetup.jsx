@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { createProfileApi, updateProfileApi, getProfileApi } from "../api/profile";
+// import { createProfileApi, updateProfileApi, getProfileApi } from "../api/profile";
 import { ImagePlus } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +25,7 @@ const ProfileSetup = () => {
   useEffect(() => {
     if (!user) {
       toast.error("No user data found. Please login again.");
-      navigate("/login");
+      navigate("/auth");
       return;
     }
 

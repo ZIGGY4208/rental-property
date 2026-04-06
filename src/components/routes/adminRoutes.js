@@ -11,7 +11,7 @@ import {
 import DashboardPage from "../pages/DashboardPage";
 import HousesPage from "../pages/HousesPage";
 import AdminProfile from "../pages/AdminProfile";
-import AdminLogout from "../pages/AdminLogout";
+import AdminLogout from "../../features/Admin.authentication/AdminLogout";
 import HouseUploadPage from "../pages/HouseUploadPage";
 import UserAdminManager from "../pages/UserAdminManager";
 import HouseUploadWrapper from "../houseUploadComponents/HouseUploadWrapper";
