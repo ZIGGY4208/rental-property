@@ -4,8 +4,13 @@ import axios from "axios";
    AXIOS INSTANCE
 ================================= */
 
+const BASE_URL =
+  import.meta.env.MODE === "development"
+    ? "http://localhost:5000/api/auth"
+    : "https://habalink-backend.onrender.com/api/auth";
+
 const API = axios.create({
-  baseURL: "http://localhost:5000/api/auth",
+  baseURL: BASE_URL,
   withCredentials: true,
 });
 
